@@ -69,6 +69,125 @@ button.primary { background:#172033; color:#fff; border-color:#172033; }
 .task-add { border:1px solid #172033; background:#172033; color:#fff; border-radius:7px; padding:7px 10px; font-size:13px; }
 .task-empty { color:#8a94a4; font-size:12px; margin:2px 0 8px; }
 .task-storage-note { margin-top:8px; color:#9aa1ac; font-size:10px; line-height:1.25; }
+
+.work-overview {
+  margin-top:14px;
+  padding-top:12px;
+  border-top:1px solid #dfe4eb;
+}
+.work-overview-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
+}
+.work-overview h2 {
+  margin:0;
+  font-size:16px;
+}
+.work-overview-note {
+  color:#8a93a0;
+  font-size:10px;
+}
+.work-list {
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.work-row {
+  display:grid;
+  grid-template-columns:118px minmax(250px,1fr) auto;
+  gap:8px;
+  align-items:center;
+  padding:7px 8px;
+  border:1px solid #e0e4ea;
+  border-radius:8px;
+  background:#fafbfc;
+}
+.work-date {
+  font-size:11px;
+  font-weight:700;
+  color:#566070;
+  white-space:nowrap;
+}
+.work-title {
+  min-width:0;
+  font-size:11px;
+  font-weight:700;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.work-actions {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  gap:5px;
+}
+.work-btn {
+  padding:5px 8px;
+  border:1px solid #cbd2dc;
+  border-radius:6px;
+  background:#fff;
+  color:#495466;
+  font-size:10px;
+  line-height:1;
+  cursor:pointer;
+}
+.work-btn.done {
+  background:#dff2e2;
+  border-color:#79b784;
+  color:#22592d;
+  font-weight:700;
+}
+.work-delete {
+  padding:5px 8px;
+  border:1px solid #e3b6b6;
+  border-radius:6px;
+  background:#fff7f7;
+  color:#9a4040;
+  font-size:10px;
+  line-height:1;
+  cursor:pointer;
+}
+.work-empty {
+  padding:8px;
+  border:1px dashed #d4dae3;
+  border-radius:8px;
+  color:#939aa6;
+  font-size:11px;
+}
+@media (max-width:1000px) {
+  .work-row { grid-template-columns:95px 1fr; }
+  .work-actions { grid-column:1 / -1; justify-content:flex-start; }
+}
+
+
+.instruction-reminder {
+  background:#fff0b8 !important;
+  border-color:#d6a72f !important;
+  color:#5d4500 !important;
+  font-weight:700;
+}
+.instruction-reminder::before {
+  content:"!";
+  display:inline-block;
+  margin-right:3px;
+  font-weight:900;
+}
+.instruction-toggle.active {
+  background:#fff0b8;
+  border-color:#d6a72f;
+  color:#5d4500;
+  font-weight:700;
+}
+.work-btn.pokyny-pending {
+  border-color:#d6a72f;
+  background:#fffaf0;
+  color:#6c5100;
+}
+
 @media (max-width:900px) {
   .legend { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .event { font-size:7px; }
@@ -78,7 +197,7 @@ button.primary { background:#172033; color:#fff; border-color:#172033; }
 @media print {
   :root { --daynum-h:17px; --lane-h:12.2px; --lane-gap:1.2px; }
   body { background:white; }
-  .toolbar, .task-btn, .task-popover { display:none !important; }
+  .toolbar, .task-btn, .task-popover, .work-overview { display:none !important; }
   .wrap { max-width:none; margin:0; padding:0; }
   .month, .month.hidden-screen { display:block !important; box-shadow:none; border:0; border-radius:0; margin:0; padding:0; height:190mm; overflow:hidden; page-break-after:always; break-after:page; }
   .month:last-child { page-break-after:auto; break-after:auto; }
@@ -100,6 +219,7 @@ button.primary { background:#172033; color:#fff; border-color:#172033; }
   <button id="prev">← Předchozí</button>
   <select id="monthSelect"></select>
   <button id="next">Další →</button>
+  <button id="instructionToggleBtn" class="instruction-toggle" type="button">Skrýt pokyny</button>
   <button class="primary" onclick="window.print()">Tisk / Uložit jako PDF</button>
 </div>
 <div class="wrap" id="app"></div>
@@ -116,10 +236,13 @@ button.primary { background:#172033; color:#fff; border-color:#172033; }
   <div class="task-storage-note">Úkoly se ukládají pouze v tomto prohlížeči na tomto zařízení.</div>
 </div>
 <script>
-const trips = [{"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-01-09", "end": "2027-01-09"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-01-16", "end": "2027-01-16"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-01-23", "end": "2027-01-23"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-01-30", "end": "2027-01-30"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-02-12", "end": "2027-02-14"}, {"title": "Monte Carlo a festival citrusů v Mentonu", "start": "2027-02-12", "end": "2027-02-14"}, {"title": "Monte Carlo a festival citrusů v Mentonu", "start": "2027-02-19", "end": "2027-02-21"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-02-20", "end": "2027-02-20"}, {"title": "Monte Carlo a festival citrusů v Mentonu", "start": "2027-02-26", "end": "2027-02-28"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-02-27", "end": "2027-02-27"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-03-06", "end": "2027-03-06"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-03-13", "end": "2027-03-13"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-03-19", "end": "2027-03-21"}, {"title": "Katalánsko se zastávkou v Monaku", "start": "2027-03-24", "end": "2027-03-28"}, {"title": "Krásy Azurového pobřeží", "start": "2027-03-25", "end": "2027-03-28"}, {"title": "Velikonoční Provence se slavností býků", "start": "2027-03-25", "end": "2027-03-28"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-03-25", "end": "2027-03-28"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-03-26", "end": "2027-03-28"}, {"title": "Monako, Monte Carlo a Nice", "start": "2027-03-26", "end": "2027-03-28"}, {"title": "To nejlepší z Kodaně", "start": "2027-04-07", "end": "2027-04-08"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-04-09", "end": "2027-04-11"}, {"title": "Za zábavou do Paříže a Disneylandu", "start": "2027-04-09", "end": "2027-04-11"}, {"title": "Monako, Monte Carlo a Nice", "start": "2027-04-09", "end": "2027-04-11"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-04-10", "end": "2027-04-10"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-04-11", "end": "2027-04-11"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-04-15", "end": "2027-04-18"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-04-17", "end": "2027-04-17"}, {"title": "Krakov a solné doly Vělička", "start": "2027-04-17", "end": "2027-04-18"}, {"title": "Okruh historickými městy Polska", "start": "2027-04-22", "end": "2027-04-26"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-04-23", "end": "2027-04-25"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-04-24", "end": "2027-04-24"}, {"title": "Paříž a nejkrásnější zámky na Loiře", "start": "2027-04-29", "end": "2027-05-02"}, {"title": "Chorvatské národní parky a přímořská města", "start": "2027-04-29", "end": "2027-05-02"}, {"title": "Kodaň, Öresundský most a Malmö", "start": "2027-04-30", "end": "2027-05-02"}, {"title": "Karlštejn, Koněpruské jeskyně a Velká Amerika", "start": "2027-05-01", "end": "2027-05-01"}, {"title": "Putování údolím Wachau", "start": "2027-05-01", "end": "2027-05-01"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-05-01", "end": "2027-05-01"}, {"title": "Prater ve Vídni a Dům moří", "start": "2027-05-01", "end": "2027-05-01"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-05-01", "end": "2027-05-01"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-05-02", "end": "2027-05-02"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-05-06", "end": "2027-05-09"}, {"title": "Hlavní města Pobaltí a Helsinky", "start": "2027-05-07", "end": "2027-05-10"}, {"title": "Karlštejn, Koněpruské jeskyně a Velká Amerika", "start": "2027-05-08", "end": "2027-05-08"}, {"title": "Jezero Wolfgangsee a historická železnice", "start": "2027-05-08", "end": "2027-05-08"}, {"title": "Putování údolím Wachau", "start": "2027-05-08", "end": "2027-05-08"}, {"title": "Kouzelný zámek Franzensburg, čokoládovna a město Baden", "start": "2027-05-08", "end": "2027-05-08"}, {"title": "Krakov a solné doly Vělička", "start": "2027-05-08", "end": "2027-05-09"}, {"title": "Chorvatské národní parky a přímořská města", "start": "2027-05-13", "end": "2027-05-16"}, {"title": "Velký okruh severním Polskem", "start": "2027-05-13", "end": "2027-05-16"}, {"title": "Kodaň, Öresundský most a Malmö", "start": "2027-05-14", "end": "2027-05-16"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-05-14", "end": "2027-05-16"}, {"title": "Přírodní krásy Slovinska", "start": "2027-05-14", "end": "2027-05-16"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-05-15", "end": "2027-05-15"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-05-15", "end": "2027-05-15"}, {"title": "Paříž a nejkrásnější zámky na Loiře", "start": "2027-05-20", "end": "2027-05-23"}, {"title": "Provence s koupáním", "start": "2027-05-20", "end": "2027-05-23"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-05-20", "end": "2027-05-23"}, {"title": "Za zábavou do Paříže a Disneylandu", "start": "2027-05-21", "end": "2027-05-23"}, {"title": "Polské Trojměstí a písečná kosa Hel", "start": "2027-05-21", "end": "2027-05-23"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-05-22", "end": "2027-05-22"}, {"title": "Jednodenní výlet k jezeru Bled", "start": "2027-05-22", "end": "2027-05-22"}, {"title": "Velký okruh Provence", "start": "2027-05-26", "end": "2027-05-30"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-05-29", "end": "2027-05-29"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-05-29", "end": "2027-05-29"}, {"title": "Okolí Berchtesgadenu a Salzburg", "start": "2027-05-29", "end": "2027-05-30"}, {"title": "5denní okruh kolem Bodamského jezera – křižovatky tří zemí", "start": "2027-06-03", "end": "2027-06-06"}, {"title": "Paříž a nejkrásnější zámky na Loiře", "start": "2027-06-03", "end": "2027-06-06"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-06-05", "end": "2027-06-05"}, {"title": "Okolí Berchtesgadenu a Salzburg", "start": "2027-06-05", "end": "2027-06-06"}, {"title": "Dvoudenní výlet za poznáním Julských Alp", "start": "2027-06-05", "end": "2027-06-06"}, {"title": "Přírodní krásy Slovinska", "start": "2027-06-07", "end": "2027-06-09"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-06-14", "end": "2027-06-16"}, {"title": "Plitvická jezera", "start": "2027-06-14", "end": "2027-06-16"}, {"title": "Helsinky, hlavní města Pobaltí a národní park Lahemaa", "start": "2027-06-16", "end": "2027-06-20"}, {"title": "Provence s koupáním", "start": "2027-06-17", "end": "2027-06-20"}, {"title": "Plitvická jezera", "start": "2027-06-21", "end": "2027-06-23"}, {"title": "Podmanivé Slovinsko s koupáním u moře", "start": "2027-06-21", "end": "2027-06-24"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-06-22", "end": "2027-06-22"}, {"title": "Okruh Skandinávií s plavbou po fjordu", "start": "2027-06-23", "end": "2027-06-28"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-06-28", "end": "2027-06-30"}, {"title": "Přírodní krásy Slovinska", "start": "2027-06-28", "end": "2027-06-30"}, {"title": "Plitvická jezera", "start": "2027-06-28", "end": "2027-06-30"}, {"title": "Jezero Wolfgangsee a historická železnice", "start": "2027-06-29", "end": "2027-06-29"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-06-29", "end": "2027-06-29"}, {"title": "Okruh Skandinávií s plavbou po fjordu", "start": "2027-06-30", "end": "2027-07-05"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-07-01", "end": "2027-07-01"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-07-01", "end": "2027-07-01"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-07-05", "end": "2027-07-05"}, {"title": "Plitvická jezera", "start": "2027-07-05", "end": "2027-07-07"}, {"title": "Podmanivé Slovinsko s koupáním u moře", "start": "2027-07-05", "end": "2027-07-08"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-07-05", "end": "2027-07-05"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-07-05", "end": "2027-07-05"}, {"title": "Za zábavou do Paříže a Disneylandu", "start": "2027-07-05", "end": "2027-07-07"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-07-05", "end": "2027-07-07"}, {"title": "Putování údolím Wachau", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "Kouzelný zámek Franzensburg, čokoládovna a město Baden", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "Soutěska Sigmund Thun Klamm a Maiskogel", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "Jednodenní výlet k jezeru Bled", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "Velký okruh severním Polskem", "start": "2027-07-07", "end": "2027-07-10"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-07-08", "end": "2027-07-08"}, {"title": "Karlštejn, Koněpruské jeskyně a Velká Amerika", "start": "2027-07-08", "end": "2027-07-08"}, {"title": "Kodaň, Öresundský most a Malmö", "start": "2027-07-12", "end": "2027-07-14"}, {"title": "Plitvická jezera", "start": "2027-07-12", "end": "2027-07-14"}, {"title": "Přírodní krásy Slovinska", "start": "2027-07-12", "end": "2027-07-14"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-07-13", "end": "2027-07-13"}, {"title": "Okruh Skandinávií s plavbou po fjordu", "start": "2027-07-14", "end": "2027-07-19"}, {"title": "Paříž a nejkrásnější zámky na Loiře", "start": "2027-07-15", "end": "2027-07-18"}, {"title": "Koupání a zábava u Neziderského jezera", "start": "2027-07-15", "end": "2027-07-15"}, {"title": "ZOO Herberstein a nejteplejší jezero v Alpách", "start": "2027-07-15", "end": "2027-07-15"}, {"title": "Plitvická jezera", "start": "2027-07-19", "end": "2027-07-21"}, {"title": "To nejlepší z Kodaně", "start": "2027-07-19", "end": "2027-07-20"}, {"title": "To nejlepší z Kodaně", "start": "2027-07-30", "end": "2027-07-31"}, {"title": "To nejlepší z Kodaně", "start": "2027-08-13", "end": "2027-08-14"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-07-20", "end": "2027-07-20"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-07-22", "end": "2027-07-22"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-07-22", "end": "2027-07-22"}, {"title": "Provence s koupáním", "start": "2027-07-24", "end": "2027-07-27"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-07-22", "end": "2027-07-22"}, {"title": "Jezero Wolfgangsee a historická železnice", "start": "2027-07-22", "end": "2027-07-22"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-07-24", "end": "2027-07-24"}, {"title": "Plitvická jezera", "start": "2027-07-26", "end": "2027-07-28"}, {"title": "Okruh Skandinávií s plavbou po fjordu", "start": "2027-07-28", "end": "2027-08-02"}, {"title": "Innsbruck a Křišťálové světy Swarovski", "start": "2027-07-28", "end": "2027-07-29"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-07-29", "end": "2027-07-29"}, {"title": "Plitvická jezera", "start": "2027-08-02", "end": "2027-08-04"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-08-02", "end": "2027-08-04"}, {"title": "Soutěska Sigmund Thun Klamm a Maiskogel", "start": "2027-08-03", "end": "2027-08-03"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-08-03", "end": "2027-08-03"}, {"title": "Okruh Skandinávií s plavbou po fjordu", "start": "2027-08-04", "end": "2027-08-09"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-08-05", "end": "2027-08-05"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-08-05", "end": "2027-08-05"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-08-05", "end": "2027-08-05"}, {"title": "Jednodenní výlet k jezeru Bled", "start": "2027-08-07", "end": "2027-08-07"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-08-08", "end": "2027-08-08"}, {"title": "Plitvická jezera", "start": "2027-08-09", "end": "2027-08-11"}, {"title": "ZOO Herberstein a nejteplejší jezero v Alpách", "start": "2027-08-09", "end": "2027-08-09"}, {"title": "Přírodní krásy Slovinska", "start": "2027-08-09", "end": "2027-08-11"}, {"title": "Putování údolím Wachau", "start": "2027-08-10", "end": "2027-08-10"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-08-10", "end": "2027-08-10"}, {"title": "Okruh Skandinávií s plavbou po fjordu", "start": "2027-08-11", "end": "2027-08-16"}, {"title": "Hlavní města Pobaltí a Helsinky", "start": "2027-08-12", "end": "2027-08-15"}, {"title": "Londýn, Windsor a Brighton", "start": "2027-08-12", "end": "2027-08-15"}, {"title": "Karlštejn, Koněpruské jeskyně a Velká Amerika", "start": "2027-08-12", "end": "2027-08-12"}, {"title": "Jezero Wolfgangsee a historická železnice", "start": "2027-08-12", "end": "2027-08-12"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-08-12", "end": "2027-08-12"}, {"title": "Jednodenní výlet k jezeru Bled", "start": "2027-08-14", "end": "2027-08-14"}, {"title": "Soutěska Sigmund Thun Klamm a Maiskogel", "start": "2027-08-14", "end": "2027-08-14"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-08-14", "end": "2027-08-14"}, {"title": "Za zábavou do Paříže a Disneylandu", "start": "2027-08-16", "end": "2027-08-18"}, {"title": "Plitvická jezera", "start": "2027-08-16", "end": "2027-08-18"}, {"title": "Jednodenní výlet k jezeru Bled", "start": "2027-08-17", "end": "2027-08-17"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-08-17", "end": "2027-08-17"}, {"title": "Podmanivé Slovinsko s koupáním u moře", "start": "2027-08-18", "end": "2027-08-21"}, {"title": "Severské metropole - Oslo, Stockholm, Kodaň, Göteborg", "start": "2027-08-18", "end": "2027-08-22"}, {"title": "Krásy Azurového pobřeží", "start": "2027-08-19", "end": "2027-08-22"}, {"title": "Koupání a zábava u Neziderského jezera", "start": "2027-08-19", "end": "2027-08-19"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-08-19", "end": "2027-08-19"}, {"title": "Okruh jižní Anglií s návštěvou Londýna", "start": "2027-08-20", "end": "2027-08-23"}, {"title": "Soutěska Sigmund Thun Klamm a Maiskogel", "start": "2027-08-21", "end": "2027-08-21"}, {"title": "Kodaň, Öresundský most a Malmö", "start": "2027-08-23", "end": "2027-08-25"}, {"title": "Plitvická jezera", "start": "2027-08-23", "end": "2027-08-25"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-08-24", "end": "2027-08-24"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-08-24", "end": "2027-08-24"}, {"title": "Velký okruh Provence", "start": "2027-08-25", "end": "2027-08-29"}, {"title": "Okruh Skandinávií s plavbou po fjordu", "start": "2027-08-25", "end": "2027-08-30"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-08-26", "end": "2027-08-26"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-08-27", "end": "2027-08-27"}, {"title": "Plitvická jezera", "start": "2027-08-30", "end": "2027-09-01"}, {"title": "Jednodenní výlet k jezeru Bled", "start": "2027-08-31", "end": "2027-08-31"}, {"title": "Jezero Wolfgangsee a historická železnice", "start": "2027-08-31", "end": "2027-08-31"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-09-02", "end": "2027-09-02"}, {"title": "Podmanivé Slovinsko s koupáním u moře", "start": "2027-09-02", "end": "2027-09-05"}, {"title": "Plitvická jezera", "start": "2027-09-06", "end": "2027-09-08"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-09-09", "end": "2027-09-12"}, {"title": "Polské Trojměstí a písečná kosa Hel", "start": "2027-09-10", "end": "2027-09-12"}, {"title": "Jednodenní výlet k jezeru Bled", "start": "2027-09-11", "end": "2027-09-11"}, {"title": "Dvoudenní výlet za poznáním Julských Alp", "start": "2027-09-11", "end": "2027-09-12"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-09-12", "end": "2027-09-12"}, {"title": "Přírodní krásy Slovinska", "start": "2027-09-13", "end": "2027-09-15"}, {"title": "Paříž a nejkrásnější zámky na Loiře", "start": "2027-09-16", "end": "2027-09-19"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-09-17", "end": "2027-09-19"}, {"title": "Krakov a solné doly Vělička", "start": "2027-09-18", "end": "2027-09-19"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-09-18", "end": "2027-09-18"}, {"title": "Alsasko a Burgundsko", "start": "2027-09-23", "end": "2027-09-28"}, {"title": "Katalánsko se zastávkou v Monaku", "start": "2027-09-23", "end": "2027-09-27"}, {"title": "Podhůří Pyrenejí s návštěvou Andorry", "start": "2027-09-23", "end": "2027-09-27"}, {"title": "Kodaň, Öresundský most a Malmö", "start": "2027-09-24", "end": "2027-09-26"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-09-24", "end": "2027-09-27"}, {"title": "Za zábavou do Paříže a Disneylandu", "start": "2027-09-24", "end": "2027-09-26"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-09-25", "end": "2027-09-25"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-09-25", "end": "2027-09-25"}, {"title": "To nejlepší z Kodaně", "start": "2027-09-27", "end": "2027-09-28"}, {"title": "Karlštejn, Koněpruské jeskyně a Velká Amerika", "start": "2027-09-28", "end": "2027-09-28"}, {"title": "Putování údolím Wachau", "start": "2027-09-28", "end": "2027-09-28"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-09-28", "end": "2027-09-28"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-09-28", "end": "2027-09-28"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-09-28", "end": "2027-09-28"}, {"title": "Velký okruh Provence", "start": "2027-09-29", "end": "2027-10-03"}, {"title": "Velký okruh severním Polskem", "start": "2027-09-30", "end": "2027-10-03"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-09-30", "end": "2027-10-03"}, {"title": "Krásy Azurového pobřeží", "start": "2027-09-30", "end": "2027-10-03"}, {"title": "Za zábavou do Paříže a Disneylandu", "start": "2027-10-01", "end": "2027-10-03"}, {"title": "Innsbruck a Křišťálové světy Swarovski", "start": "2027-10-01", "end": "2027-10-02"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-10-01", "end": "2027-10-03"}, {"title": "Monako, Monte Carlo a Nice", "start": "2027-10-01", "end": "2027-10-03"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-10-03", "end": "2027-10-03"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-10-04", "end": "2027-10-04"}, {"title": "Chorvatské národní parky a přímořská města", "start": "2027-10-07", "end": "2027-10-10"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-10-07", "end": "2027-10-10"}, {"title": "To nejlepší z Kodaně", "start": "2027-10-08", "end": "2027-10-09"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-10-08", "end": "2027-10-09"}, {"title": "Krakov a solné doly Vělička", "start": "2027-10-09", "end": "2027-10-10"}, {"title": "Paříž a nejkrásnější zámky na Loiře", "start": "2027-10-14", "end": "2027-10-17"}, {"title": "Monako, Monte Carlo a Nice", "start": "2027-10-15", "end": "2027-10-17"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-10-15", "end": "2027-10-17"}, {"title": "Kodaň, Öresundský most a Malmö", "start": "2027-10-15", "end": "2027-10-17"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-10-16", "end": "2027-10-16"}, {"title": "Krakov a solné doly Vělička", "start": "2027-10-16", "end": "2027-10-17"}, {"title": "Velký okruh severním Polskem", "start": "2027-10-20", "end": "2027-10-23"}, {"title": "Krásy Azurového pobřeží", "start": "2027-10-21", "end": "2027-10-24"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-10-22", "end": "2027-10-24"}, {"title": "Za zábavou do Paříže a Disneylandu", "start": "2027-10-22", "end": "2027-10-24"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-10-23", "end": "2027-10-23"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-10-27", "end": "2027-10-30"}, {"title": "Chorvatské národní parky a přímořská města", "start": "2027-10-27", "end": "2027-10-30"}, {"title": "Katalánsko se zastávkou v Monaku", "start": "2027-10-27", "end": "2027-10-31"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-10-28", "end": "2027-10-28"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-10-28", "end": "2027-10-30"}, {"title": "Monako, Monte Carlo a Nice", "start": "2027-10-28", "end": "2027-10-30"}, {"title": "Za zábavou do Paříže a Disneylandu", "start": "2027-10-28", "end": "2027-10-30"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-11-06", "end": "2027-11-06"}, {"title": "Monako, Monte Carlo a Nice", "start": "2027-11-12", "end": "2027-11-14"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-11-12", "end": "2027-11-14"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-11-17", "end": "2027-11-20"}];
+const trips = [{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2026-10-10","end":"2026-10-10"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2026-10-11","end":"2026-10-11"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2026-10-17","end":"2026-10-17"},{"title":"Okruh jižní Anglií s návštěvou Londýna","start":"2026-10-22","end":"2026-10-25"},{"title":"Monako, Monte Carlo a Nice","start":"2026-10-23","end":"2026-10-25"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2026-10-24","end":"2026-10-24"},{"title":"Krakov a solné doly Vělička","start":"2026-10-24","end":"2026-10-25"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2026-10-28","end":"2026-10-28"},{"title":"Kouzelná Paříž a Versailles","start":"2026-10-28","end":"2026-10-31"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2026-10-31","end":"2026-10-31"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2026-11-01","end":"2026-11-01"},{"title":"Monako, Monte Carlo a Nice","start":"2026-11-06","end":"2026-11-08"},{"title":"Nejkrásnější místa Paříže","start":"2026-11-06","end":"2026-11-08"},{"title":"Kouzelná Paříž a Versailles","start":"2026-11-13","end":"2026-11-16"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2026-11-17","end":"2026-11-17"},{"title":"Monako, Monte Carlo a Nice","start":"2026-11-20","end":"2026-11-22"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-01-09","end":"2027-01-09"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-01-16","end":"2027-01-16"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-01-23","end":"2027-01-23"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-01-30","end":"2027-01-30"},{"title":"Monte Carlo a festival citrusů v Mentonu","start":"2027-02-12","end":"2027-02-14"},{"title":"Nejkrásnější místa Paříže","start":"2027-02-12","end":"2027-02-14"},{"title":"Monte Carlo a festival citrusů v Mentonu","start":"2027-02-19","end":"2027-02-21"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-02-20","end":"2027-02-20"},{"title":"Monte Carlo a festival citrusů v Mentonu","start":"2027-02-26","end":"2027-02-28"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-02-27","end":"2027-02-27"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-03-06","end":"2027-03-06"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-03-13","end":"2027-03-13"},{"title":"Nejkrásnější místa Paříže","start":"2027-03-19","end":"2027-03-21"},{"title":"Katalánsko se zastávkou v Monaku","start":"2027-03-24","end":"2027-03-28"},{"title":"Kouzelná Paříž a Versailles","start":"2027-03-25","end":"2027-03-28"},{"title":"Krásy Azurového pobřeží","start":"2027-03-25","end":"2027-03-28"},{"title":"Velikonoční Provence se slavností býků","start":"2027-03-25","end":"2027-03-28"},{"title":"Monako, Monte Carlo a Nice","start":"2027-03-26","end":"2027-03-28"},{"title":"Nejkrásnější místa Paříže","start":"2027-03-26","end":"2027-03-28"},{"title":"To nejlepší z Kodaně","start":"2027-04-07","end":"2027-04-08"},{"title":"Monako, Monte Carlo a Nice","start":"2027-04-09","end":"2027-04-11"},{"title":"Nejkrásnější místa Paříže","start":"2027-04-09","end":"2027-04-11"},{"title":"Za zábavou do Paříže a Disneylandu","start":"2027-04-09","end":"2027-04-11"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-04-10","end":"2027-04-10"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-04-11","end":"2027-04-11"},{"title":"Kouzelná Paříž a Versailles","start":"2027-04-15","end":"2027-04-18"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-04-17","end":"2027-04-17"},{"title":"Krakov a solné doly Vělička","start":"2027-04-17","end":"2027-04-18"},{"title":"Okruh historickými městy Polska","start":"2027-04-22","end":"2027-04-26"},{"title":"Nejkrásnější místa Paříže","start":"2027-04-23","end":"2027-04-25"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-04-24","end":"2027-04-24"},{"title":"Chorvatské národní parky a přímořská města","start":"2027-04-29","end":"2027-05-02"},{"title":"Paříž a nejkrásnější zámky na Loiře","start":"2027-04-29","end":"2027-05-02"},{"title":"Kodaň, Öresundský most a Malmö","start":"2027-04-30","end":"2027-05-02"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-05-01","end":"2027-05-01"},{"title":"Karlštejn, Koněpruské jeskyně a Velká Amerika","start":"2027-05-01","end":"2027-05-01"},{"title":"Prater ve Vídni a Dům moří","start":"2027-05-01","end":"2027-05-01"},{"title":"Putování údolím Wachau","start":"2027-05-01","end":"2027-05-01"},{"title":"ZOO Vídeň a zámek Schönbrunn","start":"2027-05-01","end":"2027-05-01"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-05-02","end":"2027-05-02"},{"title":"Kouzelná Paříž a Versailles","start":"2027-05-06","end":"2027-05-09"},{"title":"Hlavní města Pobaltí a Helsinky","start":"2027-05-07","end":"2027-05-10"},{"title":"Jezero Wolfgangsee a historická železnice","start":"2027-05-08","end":"2027-05-08"},{"title":"Karlštejn, Koněpruské jeskyně a Velká Amerika","start":"2027-05-08","end":"2027-05-08"},{"title":"Kouzelný zámek Franzensburg, čokoládovna a město Baden","start":"2027-05-08","end":"2027-05-08"},{"title":"Putování údolím Wachau","start":"2027-05-08","end":"2027-05-08"},{"title":"Krakov a solné doly Vělička","start":"2027-05-08","end":"2027-05-09"},{"title":"Chorvatské národní parky a přímořská města","start":"2027-05-13","end":"2027-05-16"},{"title":"Velký okruh severním Polskem","start":"2027-05-13","end":"2027-05-16"},{"title":"Kodaň, Öresundský most a Malmö","start":"2027-05-14","end":"2027-05-16"},{"title":"Nejkrásnější místa Paříže","start":"2027-05-14","end":"2027-05-16"},{"title":"Přírodní krásy Slovinska","start":"2027-05-14","end":"2027-05-16"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-05-15","end":"2027-05-15"},{"title":"Kaňon Medvědí soutěska","start":"2027-05-15","end":"2027-05-15"},{"title":"Kouzelná Paříž a Versailles","start":"2027-05-20","end":"2027-05-23"},{"title":"Paříž a nejkrásnější zámky na Loiře","start":"2027-05-20","end":"2027-05-23"},{"title":"Provence s koupáním","start":"2027-05-20","end":"2027-05-23"},{"title":"Polské Trojměstí a písečná kosa Hel","start":"2027-05-21","end":"2027-05-23"},{"title":"Za zábavou do Paříže a Disneylandu","start":"2027-05-21","end":"2027-05-23"},{"title":"Jednodenní výlet k jezeru Bled","start":"2027-05-22","end":"2027-05-22"},{"title":"Kaňon Medvědí soutěska","start":"2027-05-22","end":"2027-05-22"},{"title":"Velký okruh Provence","start":"2027-05-26","end":"2027-05-30"},{"title":"Kaňon Medvědí soutěska","start":"2027-05-29","end":"2027-05-29"},{"title":"Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu","start":"2027-05-29","end":"2027-05-29"},{"title":"Okolí Berchtesgadenu a Salzburg","start":"2027-05-29","end":"2027-05-30"},{"title":"5denní okruh kolem Bodamského jezera – křižovatky tří zemí","start":"2027-06-03","end":"2027-06-06"},{"title":"Paříž a nejkrásnější zámky na Loiře","start":"2027-06-03","end":"2027-06-06"},{"title":"Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu","start":"2027-06-05","end":"2027-06-05"},{"title":"Dvoudenní výlet za poznáním Julských Alp","start":"2027-06-05","end":"2027-06-06"},{"title":"Okolí Berchtesgadenu a Salzburg","start":"2027-06-05","end":"2027-06-06"},{"title":"Přírodní krásy Slovinska","start":"2027-06-07","end":"2027-06-09"},{"title":"Nejkrásnější místa Paříže","start":"2027-06-14","end":"2027-06-16"},{"title":"Plitvická jezera","start":"2027-06-14","end":"2027-06-16"},{"title":"Helsinky, hlavní města Pobaltí a národní park Lahemaa","start":"2027-06-16","end":"2027-06-20"},{"title":"Provence s koupáním","start":"2027-06-17","end":"2027-06-20"},{"title":"Plitvická jezera","start":"2027-06-21","end":"2027-06-23"},{"title":"Podmanivé Slovinsko s koupáním u moře","start":"2027-06-21","end":"2027-06-24"},{"title":"Kaňon Medvědí soutěska","start":"2027-06-22","end":"2027-06-22"},{"title":"Okruh Skandinávií s plavbou po fjordu","start":"2027-06-23","end":"2027-06-28"},{"title":"Nejkrásnější místa Paříže","start":"2027-06-28","end":"2027-06-30"},{"title":"Plitvická jezera","start":"2027-06-28","end":"2027-06-30"},{"title":"Přírodní krásy Slovinska","start":"2027-06-28","end":"2027-06-30"},{"title":"Jezero Wolfgangsee a historická železnice","start":"2027-06-29","end":"2027-06-29"},{"title":"Kaňon Medvědí soutěska","start":"2027-06-29","end":"2027-06-29"},{"title":"Okruh Skandinávií s plavbou po fjordu","start":"2027-06-30","end":"2027-07-05"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-07-01","end":"2027-07-01"},{"title":"ZOO Vídeň a zámek Schönbrunn","start":"2027-07-01","end":"2027-07-01"},{"title":"Kaňon Medvědí soutěska","start":"2027-07-05","end":"2027-07-05"},{"title":"Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu","start":"2027-07-05","end":"2027-07-05"},{"title":"ZOO Vídeň a zámek Schönbrunn","start":"2027-07-05","end":"2027-07-05"},{"title":"Nejkrásnější místa Paříže","start":"2027-07-05","end":"2027-07-07"},{"title":"Plitvická jezera","start":"2027-07-05","end":"2027-07-07"},{"title":"Za zábavou do Paříže a Disneylandu","start":"2027-07-05","end":"2027-07-07"},{"title":"Podmanivé Slovinsko s koupáním u moře","start":"2027-07-05","end":"2027-07-08"},{"title":"Jednodenní výlet k jezeru Bled","start":"2027-07-06","end":"2027-07-06"},{"title":"Kaňon Medvědí soutěska","start":"2027-07-06","end":"2027-07-06"},{"title":"Kouzelný zámek Franzensburg, čokoládovna a město Baden","start":"2027-07-06","end":"2027-07-06"},{"title":"Putování údolím Wachau","start":"2027-07-06","end":"2027-07-06"},{"title":"Soutěska Sigmund Thun Klamm a Maiskogel","start":"2027-07-06","end":"2027-07-06"},{"title":"Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu","start":"2027-07-06","end":"2027-07-06"},{"title":"ZOO Vídeň a zámek Schönbrunn","start":"2027-07-06","end":"2027-07-06"},{"title":"Velký okruh severním Polskem","start":"2027-07-07","end":"2027-07-10"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-07-08","end":"2027-07-08"},{"title":"Karlštejn, Koněpruské jeskyně a Velká Amerika","start":"2027-07-08","end":"2027-07-08"},{"title":"Kodaň, Öresundský most a Malmö","start":"2027-07-12","end":"2027-07-14"},{"title":"Plitvická jezera","start":"2027-07-12","end":"2027-07-14"},{"title":"Přírodní krásy Slovinska","start":"2027-07-12","end":"2027-07-14"},{"title":"Kaňon Medvědí soutěska","start":"2027-07-13","end":"2027-07-13"},{"title":"Okruh Skandinávií s plavbou po fjordu","start":"2027-07-14","end":"2027-07-19"},{"title":"Koupání a zábava u Neziderského jezera","start":"2027-07-15","end":"2027-07-15"},{"title":"ZOO Herberstein a nejteplejší jezero v Alpách","start":"2027-07-15","end":"2027-07-15"},{"title":"Paříž a nejkrásnější zámky na Loiře","start":"2027-07-15","end":"2027-07-18"},{"title":"To nejlepší z Kodaně","start":"2027-07-19","end":"2027-07-20"},{"title":"Plitvická jezera","start":"2027-07-19","end":"2027-07-21"},{"title":"Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu","start":"2027-07-20","end":"2027-07-20"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-07-22","end":"2027-07-22"},{"title":"Jezero Wolfgangsee a historická železnice","start":"2027-07-22","end":"2027-07-22"},{"title":"Kaňon Medvědí soutěska","start":"2027-07-22","end":"2027-07-22"},{"title":"ZOO Vídeň a zámek Schönbrunn","start":"2027-07-22","end":"2027-07-22"},{"title":"Kaňon Medvědí soutěska","start":"2027-07-24","end":"2027-07-24"},{"title":"Provence s koupáním","start":"2027-07-24","end":"2027-07-27"},{"title":"Plitvická jezera","start":"2027-07-26","end":"2027-07-28"},{"title":"Innsbruck a Křišťálové světy Swarovski","start":"2027-07-28","end":"2027-07-29"},{"title":"Okruh Skandinávií s plavbou po fjordu","start":"2027-07-28","end":"2027-08-02"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-07-29","end":"2027-07-29"},{"title":"To nejlepší z Kodaně","start":"2027-07-30","end":"2027-07-31"},{"title":"Nejkrásnější místa Paříže","start":"2027-08-02","end":"2027-08-04"},{"title":"Plitvická jezera","start":"2027-08-02","end":"2027-08-04"},{"title":"Soutěska Sigmund Thun Klamm a Maiskogel","start":"2027-08-03","end":"2027-08-03"},{"title":"Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu","start":"2027-08-03","end":"2027-08-03"},{"title":"Okruh Skandinávií s plavbou po fjordu","start":"2027-08-04","end":"2027-08-09"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-08-05","end":"2027-08-05"},{"title":"Kaňon Medvědí soutěska","start":"2027-08-05","end":"2027-08-05"},{"title":"ZOO Vídeň a zámek Schönbrunn","start":"2027-08-05","end":"2027-08-05"},{"title":"Jednodenní výlet k jezeru Bled","start":"2027-08-07","end":"2027-08-07"},{"title":"Kaňon Medvědí soutěska","start":"2027-08-08","end":"2027-08-08"},{"title":"ZOO Herberstein a nejteplejší jezero v Alpách","start":"2027-08-09","end":"2027-08-09"},{"title":"Plitvická jezera","start":"2027-08-09","end":"2027-08-11"},{"title":"Přírodní krásy Slovinska","start":"2027-08-09","end":"2027-08-11"},{"title":"Putování údolím Wachau","start":"2027-08-10","end":"2027-08-10"},{"title":"Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu","start":"2027-08-10","end":"2027-08-10"},{"title":"Okruh Skandinávií s plavbou po fjordu","start":"2027-08-11","end":"2027-08-16"},{"title":"Jezero Wolfgangsee a historická železnice","start":"2027-08-12","end":"2027-08-12"},{"title":"Karlštejn, Koněpruské jeskyně a Velká Amerika","start":"2027-08-12","end":"2027-08-12"},{"title":"ZOO Vídeň a zámek Schönbrunn","start":"2027-08-12","end":"2027-08-12"},{"title":"Hlavní města Pobaltí a Helsinky","start":"2027-08-12","end":"2027-08-15"},{"title":"Londýn, Windsor a Brighton","start":"2027-08-12","end":"2027-08-15"},{"title":"To nejlepší z Kodaně","start":"2027-08-13","end":"2027-08-14"},{"title":"Jednodenní výlet k jezeru Bled","start":"2027-08-14","end":"2027-08-14"},{"title":"Kaňon Medvědí soutěska","start":"2027-08-14","end":"2027-08-14"},{"title":"Soutěska Sigmund Thun Klamm a Maiskogel","start":"2027-08-14","end":"2027-08-14"},{"title":"Plitvická jezera","start":"2027-08-16","end":"2027-08-18"},{"title":"Za zábavou do Paříže a Disneylandu","start":"2027-08-16","end":"2027-08-18"},{"title":"Jednodenní výlet k jezeru Bled","start":"2027-08-17","end":"2027-08-17"},{"title":"Kaňon Medvědí soutěska","start":"2027-08-17","end":"2027-08-17"},{"title":"Podmanivé Slovinsko s koupáním u moře","start":"2027-08-18","end":"2027-08-21"},{"title":"Severské metropole - Oslo, Stockholm, Kodaň, Göteborg","start":"2027-08-18","end":"2027-08-22"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-08-19","end":"2027-08-19"},{"title":"Koupání a zábava u Neziderského jezera","start":"2027-08-19","end":"2027-08-19"},{"title":"Krásy Azurového pobřeží","start":"2027-08-19","end":"2027-08-22"},{"title":"Okruh jižní Anglií s návštěvou Londýna","start":"2027-08-20","end":"2027-08-23"},{"title":"Soutěska Sigmund Thun Klamm a Maiskogel","start":"2027-08-21","end":"2027-08-21"},{"title":"Kodaň, Öresundský most a Malmö","start":"2027-08-23","end":"2027-08-25"},{"title":"Plitvická jezera","start":"2027-08-23","end":"2027-08-25"},{"title":"Kaňon Medvědí soutěska","start":"2027-08-24","end":"2027-08-24"},{"title":"Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu","start":"2027-08-24","end":"2027-08-24"},{"title":"Velký okruh Provence","start":"2027-08-25","end":"2027-08-29"},{"title":"Okruh Skandinávií s plavbou po fjordu","start":"2027-08-25","end":"2027-08-30"},{"title":"ZOO Vídeň a zámek Schönbrunn","start":"2027-08-26","end":"2027-08-26"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-08-27","end":"2027-08-27"},{"title":"Plitvická jezera","start":"2027-08-30","end":"2027-09-01"},{"title":"Jednodenní výlet k jezeru Bled","start":"2027-08-31","end":"2027-08-31"},{"title":"Jezero Wolfgangsee a historická železnice","start":"2027-08-31","end":"2027-08-31"},{"title":"Kaňon Medvědí soutěska","start":"2027-09-02","end":"2027-09-02"},{"title":"Podmanivé Slovinsko s koupáním u moře","start":"2027-09-02","end":"2027-09-05"},{"title":"Plitvická jezera","start":"2027-09-06","end":"2027-09-08"},{"title":"Kouzelná Paříž a Versailles","start":"2027-09-09","end":"2027-09-12"},{"title":"Polské Trojměstí a písečná kosa Hel","start":"2027-09-10","end":"2027-09-12"},{"title":"Jednodenní výlet k jezeru Bled","start":"2027-09-11","end":"2027-09-11"},{"title":"Dvoudenní výlet za poznáním Julských Alp","start":"2027-09-11","end":"2027-09-12"},{"title":"Kaňon Medvědí soutěska","start":"2027-09-12","end":"2027-09-12"},{"title":"Přírodní krásy Slovinska","start":"2027-09-13","end":"2027-09-15"},{"title":"Paříž a nejkrásnější zámky na Loiře","start":"2027-09-16","end":"2027-09-19"},{"title":"Nejkrásnější místa Paříže","start":"2027-09-17","end":"2027-09-19"},{"title":"Kaňon Medvědí soutěska","start":"2027-09-18","end":"2027-09-18"},{"title":"Krakov a solné doly Vělička","start":"2027-09-18","end":"2027-09-19"},{"title":"Katalánsko se zastávkou v Monaku","start":"2027-09-23","end":"2027-09-27"},{"title":"Podhůří Pyrenejí s návštěvou Andorry","start":"2027-09-23","end":"2027-09-27"},{"title":"Alsasko a Burgundsko","start":"2027-09-23","end":"2027-09-28"},{"title":"Kodaň, Öresundský most a Malmö","start":"2027-09-24","end":"2027-09-26"},{"title":"Za zábavou do Paříže a Disneylandu","start":"2027-09-24","end":"2027-09-26"},{"title":"Kouzelná Paříž a Versailles","start":"2027-09-24","end":"2027-09-27"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-09-25","end":"2027-09-25"},{"title":"Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu","start":"2027-09-25","end":"2027-09-25"},{"title":"To nejlepší z Kodaně","start":"2027-09-27","end":"2027-09-28"},{"title":"Karlštejn, Koněpruské jeskyně a Velká Amerika","start":"2027-09-28","end":"2027-09-28"},{"title":"Kaňon Medvědí soutěska","start":"2027-09-28","end":"2027-09-28"},{"title":"Putování údolím Wachau","start":"2027-09-28","end":"2027-09-28"},{"title":"Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu","start":"2027-09-28","end":"2027-09-28"},{"title":"ZOO Vídeň a zámek Schönbrunn","start":"2027-09-28","end":"2027-09-28"},{"title":"Velký okruh Provence","start":"2027-09-29","end":"2027-10-03"},{"title":"Kouzelná Paříž a Versailles","start":"2027-09-30","end":"2027-10-03"},{"title":"Krásy Azurového pobřeží","start":"2027-09-30","end":"2027-10-03"},{"title":"Velký okruh severním Polskem","start":"2027-09-30","end":"2027-10-03"},{"title":"Innsbruck a Křišťálové světy Swarovski","start":"2027-10-01","end":"2027-10-02"},{"title":"Monako, Monte Carlo a Nice","start":"2027-10-01","end":"2027-10-03"},{"title":"Nejkrásnější místa Paříže","start":"2027-10-01","end":"2027-10-03"},{"title":"Za zábavou do Paříže a Disneylandu","start":"2027-10-01","end":"2027-10-03"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-10-03","end":"2027-10-03"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-10-04","end":"2027-10-04"},{"title":"Chorvatské národní parky a přímořská města","start":"2027-10-07","end":"2027-10-10"},{"title":"Kouzelná Paříž a Versailles","start":"2027-10-07","end":"2027-10-10"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-10-08","end":"2027-10-09"},{"title":"To nejlepší z Kodaně","start":"2027-10-08","end":"2027-10-09"},{"title":"Krakov a solné doly Vělička","start":"2027-10-09","end":"2027-10-10"},{"title":"Paříž a nejkrásnější zámky na Loiře","start":"2027-10-14","end":"2027-10-17"},{"title":"Kodaň, Öresundský most a Malmö","start":"2027-10-15","end":"2027-10-17"},{"title":"Monako, Monte Carlo a Nice","start":"2027-10-15","end":"2027-10-17"},{"title":"Nejkrásnější místa Paříže","start":"2027-10-15","end":"2027-10-17"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-10-16","end":"2027-10-16"},{"title":"Krakov a solné doly Vělička","start":"2027-10-16","end":"2027-10-17"},{"title":"Velký okruh severním Polskem","start":"2027-10-20","end":"2027-10-23"},{"title":"Krásy Azurového pobřeží","start":"2027-10-21","end":"2027-10-24"},{"title":"Nejkrásnější místa Paříže","start":"2027-10-22","end":"2027-10-24"},{"title":"Za zábavou do Paříže a Disneylandu","start":"2027-10-22","end":"2027-10-24"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-10-23","end":"2027-10-23"},{"title":"Chorvatské národní parky a přímořská města","start":"2027-10-27","end":"2027-10-30"},{"title":"Kouzelná Paříž a Versailles","start":"2027-10-27","end":"2027-10-30"},{"title":"Katalánsko se zastávkou v Monaku","start":"2027-10-27","end":"2027-10-31"},{"title":"ZOO Vídeň a zámek Schönbrunn","start":"2027-10-28","end":"2027-10-28"},{"title":"Monako, Monte Carlo a Nice","start":"2027-10-28","end":"2027-10-30"},{"title":"Nejkrásnější místa Paříže","start":"2027-10-28","end":"2027-10-30"},{"title":"Za zábavou do Paříže a Disneylandu","start":"2027-10-28","end":"2027-10-30"},{"title":"Exkurze do Osvětimi se vstupem v ceně","start":"2027-11-06","end":"2027-11-06"},{"title":"Monako, Monte Carlo a Nice","start":"2027-11-12","end":"2027-11-14"},{"title":"Nejkrásnější místa Paříže","start":"2027-11-12","end":"2027-11-14"},{"title":"Kouzelná Paříž a Versailles","start":"2027-11-17","end":"2027-11-20"}];
 const monthNamesTitle = ["Leden","Únor","Březen","Duben","Květen","Červen","Červenec","Srpen","Září","Říjen","Listopad","Prosinec"];
 const weekdays = ["Po","Út","St","Čt","Pá","So","Ne"];
 const TASK_STORAGE_PREFIX = "ck_calendar_a_tasks_v2" + "_";
+const WORK_STORAGE_PREFIX = "ck_calendar_a_work_v1_";
+const INSTRUCTION_VISIBILITY_KEY = "ck_calendar_tz_show_instruction_reminders";
+let showInstructionReminders = localStorage.getItem(INSTRUCTION_VISIBILITY_KEY) !== "0";
 
 function parseISO(s) { const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d,12,0,0); }
 function dateKey(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
@@ -128,7 +251,16 @@ function mondayIndex(jsDay) { return (jsDay+6)%7; }
 function minDate(a,b) { return a<b?a:b; }
 function maxDate(a,b) { return a>b?a:b; }
 
-trips.forEach((t,i)=>{ t.id=i; t.startD=parseISO(t.start); t.endD=parseISO(t.end); });
+const tripDuplicateCounter = {};
+trips.forEach((t,i)=>{
+  t.id=i;
+  t.startD=parseISO(t.start);
+  t.endD=parseISO(t.end);
+  const base=`${t.title}|${t.start}|${t.end}`;
+  const occurrence=tripDuplicateCounter[base]||0;
+  tripDuplicateCounter[base]=occurrence+1;
+  t.uid=`${base}|${occurrence}`;
+});
 const titles=[...new Set(trips.map(t=>t.title))].sort((a,b)=>a.localeCompare(b,"cs"));
 const colorMap=new Map();
 titles.forEach((title,i)=>{
@@ -145,12 +277,27 @@ function monthWeeks(year,month) {
   for(let w=new Date(gridStart);w<=gridEnd;w=addDays(w,7)) weeks.push(Array.from({length:7},(_,i)=>addDays(w,i)));
   return weeks;
 }
-function monthTrips(year,month) { const {start,end}=monthBounds(year,month); return trips.filter(t=>t.startD<=end && t.endD>=start); }
+function monthTrips(year,month) { const {start,end}=monthBounds(year,month); return trips.filter(t=>!isTripDeleted(t) && t.startD<=end && t.endD>=start); }
 function segmentsForWeek(year,month,weekDays) {
   const m=monthBounds(year,month), ws=weekDays[0], we=weekDays[6], segs=[];
   for(const t of monthTrips(year,month)) {
     const a=maxDate(t.startD,maxDate(ws,m.start)), b=minDate(t.endD,minDate(we,m.end));
-    if(a<=b) segs.push({trip:t,start:a,end:b,startCol:mondayIndex(a.getDay()),endCol:mondayIndex(b.getDay()),continuesLeft:t.startD<a,continuesRight:t.endD>b});
+    if(a<=b) segs.push({kind:"trip",trip:t,start:a,end:b,startCol:mondayIndex(a.getDay()),endCol:mondayIndex(b.getDay()),continuesLeft:t.startD<a,continuesRight:t.endD>b});
+  }
+  for(const r of instructionRemindersForMonth(year,month)) {
+    if(r.date>=ws && r.date<=we) {
+      const col=mondayIndex(r.date.getDay());
+      segs.push({
+        kind:"instruction",
+        trip:r.trip,
+        start:r.date,
+        end:r.date,
+        startCol:col,
+        endCol:col,
+        continuesLeft:false,
+        continuesRight:false
+      });
+    }
   }
   segs.sort((x,y)=>x.start-y.start || y.end-x.end || x.trip.title.localeCompare(y.trip.title,"cs"));
   const laneEnds=[];
@@ -161,6 +308,153 @@ function segmentsForWeek(year,month,weekDays) {
     s.lane=lane;
   }
   return {segs,laneCount:laneEnds.length};
+}
+
+
+
+function normalizeTitleForReminder(title) {
+  return title.toLocaleLowerCase("cs-CZ");
+}
+function isParisOrRomeTrip(t) {
+  const s=normalizeTitleForReminder(t.title);
+  return s.includes("paříž") || s.includes("řím");
+}
+function subtractCalendarMonth(d) {
+  const y=d.getFullYear();
+  const m=d.getMonth();
+  const day=d.getDate();
+  const targetLast=new Date(y,m,0,12).getDate();
+  return new Date(y,m-1,Math.min(day,targetLast),12);
+}
+function instructionDueDate(t) {
+  if(isParisOrRomeTrip(t)) return subtractCalendarMonth(t.startD);
+  return addDays(t.startD,-10);
+}
+function instructionRemindersForMonth(year,month) {
+  if(!showInstructionReminders) return [];
+  return trips
+    .filter(t=>!isTripDeleted(t) && !loadWork(t.uid).pokyny)
+    .map(t=>({trip:t,date:instructionDueDate(t)}))
+    .filter(r=>r.date.getFullYear()===year && r.date.getMonth()===month);
+}
+function formatShortDate(d) {
+  return d.toLocaleDateString("cs-CZ",{day:"numeric",month:"numeric"});
+}
+
+const WORK_FIELDS = [
+  ["ubytovani","Ubytování"],
+  ["pruvodce","Průvodce"],
+  ["pokyny","Pokyny"],
+  ["odbaveni","Odbavení"],
+  ["rezervace","Rezervace"]
+];
+
+function workKey(uid) { return WORK_STORAGE_PREFIX + encodeURIComponent(uid); }
+function loadWork(uid) {
+  try {
+    return JSON.parse(localStorage.getItem(workKey(uid)) || "{}");
+  } catch(e) {
+    return {};
+  }
+}
+function saveWork(uid,state) {
+  localStorage.setItem(workKey(uid), JSON.stringify(state));
+}
+function isTripDeleted(t) {
+  return !!loadWork(t.uid).deleted;
+}
+function toggleWorkField(t,field) {
+  const state=loadWork(t.uid);
+  state[field]=!state[field];
+  saveWork(t.uid,state);
+  renderAllMonths();
+}
+function deleteTripFromCalendar(t) {
+  const state=loadWork(t.uid);
+  state.deleted=true;
+  saveWork(t.uid,state);
+  renderAllMonths();
+}
+function departuresForMonth(year,month) {
+  return trips.filter(t =>
+    !isTripDeleted(t) &&
+    t.startD.getFullYear()===year &&
+    t.startD.getMonth()===month
+  );
+}
+function formatTripRange(t) {
+  const s=t.startD.toLocaleDateString("cs-CZ");
+  const e=t.endD.toLocaleDateString("cs-CZ");
+  return s===e ? s : `${s} – ${e}`;
+}
+function buildWorkOverview(year,month) {
+  const wrap=document.createElement("div");
+  wrap.className="work-overview";
+
+  const head=document.createElement("div");
+  head.className="work-overview-head";
+  head.innerHTML=`<h2>Pracovní přehled termínů</h2><div class="work-overview-note">Kliknutím se stav uloží a tlačítko zezelená.</div>`;
+  wrap.appendChild(head);
+
+  const list=document.createElement("div");
+  list.className="work-list";
+  const monthDepartures=departuresForMonth(year,month)
+    .sort((a,b)=>a.startD-b.startD || a.endD-b.endD || a.title.localeCompare(b.title,"cs"));
+
+  if(!monthDepartures.length) {
+    const empty=document.createElement("div");
+    empty.className="work-empty";
+    empty.textContent="V tomto měsíci nejsou žádné odjezdy zájezdů.";
+    list.appendChild(empty);
+  } else {
+    monthDepartures.forEach(t=>{
+      const state=loadWork(t.uid);
+      const row=document.createElement("div");
+      row.className="work-row";
+
+      const date=document.createElement("div");
+      date.className="work-date";
+      date.textContent=formatTripRange(t);
+
+      const title=document.createElement("div");
+      title.className="work-title";
+      title.textContent=t.title;
+      title.title=t.title;
+
+      const actions=document.createElement("div");
+      actions.className="work-actions";
+
+      WORK_FIELDS.forEach(([field,label])=>{
+        const b=document.createElement("button");
+        b.type="button";
+        b.className="work-btn"+(state[field] ? " done" : "");
+        if(field==="pokyny") {
+          const due=instructionDueDate(t);
+          b.textContent=`Pokyny · do ${formatShortDate(due)}`;
+          b.title=isParisOrRomeTrip(t) ? "Upomínka měsíc před odjezdem" : "Upomínka 10 dní před odjezdem";
+          if(!state[field]) b.classList.add("pokyny-pending");
+        } else {
+          b.textContent=label;
+        }
+        b.addEventListener("click",()=>toggleWorkField(t,field));
+        actions.appendChild(b);
+      });
+
+      const del=document.createElement("button");
+      del.type="button";
+      del.className="work-delete";
+      del.textContent="Odstranit";
+      del.title="Odstranit tento konkrétní termín z kalendáře";
+      del.addEventListener("click",()=>deleteTripFromCalendar(t));
+      actions.appendChild(del);
+
+      row.append(date,title,actions);
+      list.appendChild(row);
+    });
+  }
+
+  wrap.appendChild(list);
+  return wrap;
 }
 
 function loadTasks(dateStr) {
@@ -238,8 +532,17 @@ function createMonth(year,month) {
     for(const s of segs) {
       const el=document.createElement("div"); el.className="event"; if(s.continuesLeft) el.classList.add("cont-left"); if(s.continuesRight) el.classList.add("cont-right");
       el.style.left=`calc(${s.startCol} * (100% / 7) + 2px)`; el.style.width=`calc(${s.endCol-s.startCol+1} * (100% / 7) - 4px)`;
-      el.style.top=`calc(${s.lane} * (var(--lane-h) + var(--lane-gap)))`; el.style.background=colorMap.get(s.trip.title);
-      el.title=`${s.trip.title} · ${s.trip.startD.toLocaleDateString("cs-CZ")}–${s.trip.endD.toLocaleDateString("cs-CZ")}`; el.textContent=s.trip.title; layer.appendChild(el);
+      el.style.top=`calc(${s.lane} * (var(--lane-h) + var(--lane-gap)))`;
+      if(s.kind==="instruction") {
+        el.classList.add("instruction-reminder");
+        el.title=`Pokyny – ${s.trip.title} · termín ${s.trip.startD.toLocaleDateString("cs-CZ")}`;
+        el.textContent=`POKYNY · ${s.trip.title}`;
+      } else {
+        el.style.background=colorMap.get(s.trip.title);
+        el.title=`${s.trip.title} · ${s.trip.startD.toLocaleDateString("cs-CZ")}–${s.trip.endD.toLocaleDateString("cs-CZ")}`;
+        el.textContent=s.trip.title;
+      }
+      layer.appendChild(el);
     }
     week.appendChild(layer); section.appendChild(week);
   }
@@ -250,13 +553,33 @@ function createMonth(year,month) {
   }
   const note=document.createElement("div"); note.className="note";
   note.textContent=unique.length ? "Stejný zájezd má ve všech měsících stejnou barvu. + vpravo nahoře u dne otevře osobní úkoly." : "Prázdný měsíc bez zájezdů. + vpravo nahoře u každého dne otevře osobní úkoly.";
-  section.appendChild(note); return section;
+  section.appendChild(note); section.appendChild(buildWorkOverview(year,month));
+  return section;
 }
 
 const app=document.getElementById("app");
 const monthKeys=[];
 for(let y=2026;y<=2027;y++) { const from=(y===2026?9:0), to=11; for(let m=from;m<=to;m++) monthKeys.push({year:y,month:m}); }
-monthKeys.forEach(k=>app.appendChild(createMonth(k.year,k.month)));
+
+function updateInstructionToggleButton() {
+  const btn=document.getElementById("instructionToggleBtn");
+  if(!btn) return;
+  btn.textContent=showInstructionReminders ? "Skrýt pokyny" : "Zobrazit pokyny";
+  btn.classList.toggle("active",showInstructionReminders);
+}
+function toggleInstructionReminders() {
+  showInstructionReminders=!showInstructionReminders;
+  localStorage.setItem(INSTRUCTION_VISIBILITY_KEY,showInstructionReminders ? "1" : "0");
+  renderAllMonths();
+  updateInstructionToggleButton();
+}
+
+function renderAllMonths() {
+  app.innerHTML="";
+  monthKeys.forEach(k=>app.appendChild(createMonth(k.year,k.month)));
+  document.querySelectorAll(".month").forEach((el,i)=>el.classList.toggle("hidden-screen",i!==currentIndex));
+  document.querySelectorAll(".task-btn").forEach(updateTaskButton);
+}
 
 const select=document.getElementById("monthSelect");
 monthKeys.forEach((k,i)=>{ const o=document.createElement("option"); o.value=String(i); o.textContent=`${monthNamesTitle[k.month]} ${k.year}`; select.appendChild(o); });
@@ -265,6 +588,7 @@ function showMonth() { document.querySelectorAll(".month").forEach((el,i)=>el.cl
 document.getElementById("prev").onclick=()=>{ currentIndex=(currentIndex-1+monthKeys.length)%monthKeys.length; showMonth(); };
 document.getElementById("next").onclick=()=>{ currentIndex=(currentIndex+1)%monthKeys.length; showMonth(); };
 select.onchange=()=>{ currentIndex=Number(select.value); showMonth(); };
+document.getElementById("instructionToggleBtn").addEventListener("click",toggleInstructionReminders);
 document.getElementById("taskAddBtn").addEventListener("click",addTaskFromInput);
 document.getElementById("taskClose").addEventListener("click",closeTaskPopover);
 document.querySelector("#taskPopover .task-input").addEventListener("keydown",e=>{ if(e.key==="Enter") addTaskFromInput(); });
@@ -272,6 +596,8 @@ document.addEventListener("click",e=>{ const box=document.getElementById("taskPo
 window.addEventListener("resize",()=>{ if(activeTaskButton) positionTaskPopover(activeTaskButton); });
 window.addEventListener("scroll",()=>{ if(activeTaskButton) positionTaskPopover(activeTaskButton); },true);
 
+renderAllMonths();
+updateInstructionToggleButton();
 showMonth();
 </script>
 </body>
