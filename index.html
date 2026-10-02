@@ -3,247 +3,96 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Kalendář zájezdů 2027</title>
+<title>Kalendář zájezdů 2026–2027</title>
 <style>
-  :root {
-    --line:#d9dee7;
-    --muted:#6b7280;
-    --bg:#f4f6f9;
-    --paper:#fff;
-    --daynum-h:22px;
-    --lane-h:15px;
-    --lane-gap:2px;
-  }
-  * { box-sizing:border-box; }
-  body {
-    margin:0;
-    font-family: Arial, "Segoe UI", sans-serif;
-    background:var(--bg);
-    color:#172033;
-  }
-  .toolbar {
-    position:sticky;
-    top:0;
-    z-index:50;
-    display:flex;
-    gap:8px;
-    align-items:center;
-    justify-content:center;
-    padding:10px;
-    background:rgba(255,255,255,.96);
-    border-bottom:1px solid var(--line);
-    box-shadow:0 2px 10px rgba(0,0,0,.05);
-  }
-  button, select {
-    border:1px solid #cbd2dc;
-    background:white;
-    border-radius:8px;
-    padding:8px 11px;
-    font-size:14px;
-    cursor:pointer;
-  }
-  button.primary {
-    background:#172033;
-    color:#fff;
-    border-color:#172033;
-  }
-  .wrap {
-    max-width:1500px;
-    margin:18px auto 50px;
-    padding:0 16px;
-  }
-  .month {
-    background:var(--paper);
-    border:1px solid #e0e4ea;
-    border-radius:14px;
-    box-shadow:0 8px 28px rgba(21,31,48,.08);
-    padding:14px;
-    margin-bottom:18px;
-    page-break-after:always;
-    break-after:page;
-  }
-  .month.hidden-screen { display:none; }
-  .month-title {
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-end;
-    gap:12px;
-    margin:0 2px 10px;
-  }
-  .month-title h1 {
-    margin:0;
-    font-size:25px;
-    letter-spacing:.2px;
-  }
-  .month-title .meta {
-    font-size:12px;
-    color:var(--muted);
-    white-space:nowrap;
-  }
-  .weekday-row {
-    display:grid;
-    grid-template-columns:repeat(7,1fr);
-    border:1px solid var(--line);
-    border-bottom:0;
-    border-radius:9px 9px 0 0;
-    overflow:hidden;
-  }
-  .weekday {
-    padding:5px 6px;
-    text-align:center;
-    font-weight:700;
-    font-size:11px;
-    text-transform:uppercase;
-    letter-spacing:.6px;
-    background:#edf1f6;
-    border-right:1px solid var(--line);
-  }
-  .weekday:last-child { border-right:0; }
-  .week {
-    position:relative;
-    display:grid;
-    grid-template-columns:repeat(7,1fr);
-    border-left:1px solid var(--line);
-    border-right:1px solid var(--line);
-    border-top:1px solid var(--line);
-    min-height:42px;
-  }
-  .week:last-of-type {
-    border-bottom:1px solid var(--line);
-    border-radius:0 0 9px 9px;
-    overflow:hidden;
-  }
-  .day {
-    position:relative;
-    min-width:0;
-    border-right:1px solid var(--line);
-    background:#fff;
-  }
-  .day:last-child { border-right:0; }
-  .day.out { background:#f7f8fa; }
-  .day.weekend { background:#fbfbfd; }
-  .day.out .daynum { color:#b4bac4; }
-  .daynum {
-    position:absolute;
-    top:3px;
-    left:5px;
-    z-index:3;
-    font-weight:700;
-    font-size:10px;
-    color:#4a5568;
-  }
-  .events {
-    position:absolute;
-    inset:var(--daynum-h) 0 3px 0;
-    pointer-events:none;
-    z-index:5;
-  }
-  .event {
-    position:absolute;
-    height:var(--lane-h);
-    line-height:var(--lane-h);
-    border-radius:4px;
-    padding:0 4px;
-    font-size:8.2px;
-    font-weight:700;
-    color:#18202f;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    border:1px solid rgba(0,0,0,.12);
-    box-shadow:0 1px 1px rgba(0,0,0,.05);
-    pointer-events:auto;
-  }
-  .event.cont-left {
-    border-top-left-radius:0;
-    border-bottom-left-radius:0;
-  }
-  .event.cont-right {
-    border-top-right-radius:0;
-    border-bottom-right-radius:0;
-  }
-  .legend {
-    display:grid;
-    grid-template-columns:repeat(4, minmax(0,1fr));
-    gap:4px 10px;
-    margin-top:9px;
-  }
-  .legend-item {
-    display:flex;
-    align-items:center;
-    gap:5px;
-    min-width:0;
-    font-size:9px;
-    line-height:1.2;
-  }
-  .swatch {
-    width:12px;
-    height:9px;
-    border-radius:3px;
-    border:1px solid rgba(0,0,0,.12);
-    flex:0 0 auto;
-  }
-  .legend-text {
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-  }
-  .note {
-    margin:7px 2px 0;
-    color:#7a8290;
-    font-size:9px;
-  }
-  .work-panel{margin-top:18px;background:#fff;border:1px solid #e0e4ea;border-radius:14px;box-shadow:0 8px 28px rgba(21,31,48,.08);padding:14px}.work-panel h2{margin:0 0 5px;font-size:20px}.work-help{margin:0 0 12px;color:var(--muted);font-size:12px}.trip-list{display:grid;gap:8px}.trip-card{display:grid;grid-template-columns:minmax(260px,1fr) auto auto;gap:10px;align-items:center;border:1px solid var(--line);border-left:6px solid var(--trip-color,#cbd2dc);border-radius:10px;padding:9px 10px;background:#fff}.trip-name{font-size:13px;font-weight:700}.trip-date{margin-top:3px;font-size:11px;color:var(--muted)}.status-buttons{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end}.status-btn,.delete-btn{padding:6px 8px;border-radius:7px;font-size:11px}.status-btn.done{background:#d8f3df;border-color:#58a96c;color:#155b2b;font-weight:700}.delete-btn{border-color:#e2a8a8;color:#a32626}.instruction-event{background:#fff1a8!important;border-color:#d6a700!important;color:#5c4600!important}@media(max-width:1100px){.trip-card{grid-template-columns:1fr}.status-buttons{justify-content:flex-start}.delete-btn{justify-self:start}}
-  @media (max-width: 900px) {
-    .legend { grid-template-columns:repeat(2,minmax(0,1fr)); }
-    .event { font-size:7px; }
-  }
-  @page {
-    size:A4 landscape;
-    margin:7mm;
-  }
-  @media print {
-    :root {
-      --daynum-h:17px;
-      --lane-h:12.2px;
-      --lane-gap:1.2px;
-    }
-    body { background:white; }
-    .toolbar, .work-panel { display:none !important; }
-    .wrap { max-width:none; margin:0; padding:0; }
-    .month, .month.hidden-screen {
-      display:block !important;
-      box-shadow:none;
-      border:0;
-      border-radius:0;
-      margin:0;
-      padding:0;
-      height:190mm;
-      overflow:hidden;
-      page-break-after:always;
-      break-after:page;
-    }
-    .month:last-child { page-break-after:auto; break-after:auto; }
-    .month-title { margin:0 0 5px; }
-    .month-title h1 { font-size:18px; }
-    .month-title .meta { font-size:8px; }
-    .weekday { font-size:8px; padding:3px; }
-    .daynum { font-size:7.5px; top:2px; left:4px; }
-    .event {
-      font-size:6.3px;
-      padding:0 2.5px;
-      border-radius:2px;
-      box-shadow:none;
-    }
-    .legend {
-      grid-template-columns:repeat(5,minmax(0,1fr));
-      gap:2px 7px;
-      margin-top:5px;
-    }
-    .legend-item { font-size:6.8px; gap:3px; }
-    .swatch { width:8px; height:6px; }
-    .note { display:none; }
-  }
+:root {
+  --line:#d9dee7; --muted:#6b7280; --bg:#f4f6f9; --paper:#fff;
+  --daynum-h:24px; --lane-h:15px; --lane-gap:2px;
+}
+* { box-sizing:border-box; }
+body { margin:0; font-family:Arial,"Segoe UI",sans-serif; background:var(--bg); color:#172033; }
+.toolbar {
+  position:sticky; top:0; z-index:100; display:flex; gap:8px; align-items:center; justify-content:center;
+  padding:10px; background:rgba(255,255,255,.97); border-bottom:1px solid var(--line); box-shadow:0 2px 10px rgba(0,0,0,.05);
+}
+button, select { border:1px solid #cbd2dc; background:white; border-radius:8px; padding:8px 11px; font-size:14px; cursor:pointer; }
+button.primary { background:#172033; color:#fff; border-color:#172033; }
+.wrap { max-width:1500px; margin:18px auto 50px; padding:0 16px; }
+.month { background:var(--paper); border:1px solid #e0e4ea; border-radius:14px; box-shadow:0 8px 28px rgba(21,31,48,.08); padding:14px; margin-bottom:18px; page-break-after:always; break-after:page; }
+.month.hidden-screen { display:none; }
+.month-title { display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin:0 2px 10px; }
+.month-title h1 { margin:0; font-size:25px; letter-spacing:.2px; }
+.month-title .meta { font-size:12px; color:var(--muted); white-space:nowrap; }
+.weekday-row { display:grid; grid-template-columns:repeat(7,1fr); border:1px solid var(--line); border-bottom:0; border-radius:9px 9px 0 0; overflow:hidden; }
+.weekday { padding:5px 6px; text-align:center; font-weight:700; font-size:11px; text-transform:uppercase; letter-spacing:.6px; background:#edf1f6; border-right:1px solid var(--line); }
+.weekday:last-child { border-right:0; }
+.week { position:relative; display:grid; grid-template-columns:repeat(7,1fr); border-left:1px solid var(--line); border-right:1px solid var(--line); border-top:1px solid var(--line); min-height:47px; }
+.week:last-of-type { border-bottom:1px solid var(--line); border-radius:0 0 9px 9px; overflow:hidden; }
+.day { position:relative; min-width:0; border-right:1px solid var(--line); background:#fff; }
+.day:last-child { border-right:0; }
+.day.out { background:#f7f8fa; }
+.day.weekend { background:#fbfbfd; }
+.day.out .daynum { color:#b4bac4; }
+.daynum { position:absolute; top:4px; left:6px; z-index:3; font-weight:700; font-size:10px; color:#4a5568; }
+.events { position:absolute; inset:var(--daynum-h) 0 3px 0; pointer-events:none; z-index:5; }
+.event { position:absolute; height:var(--lane-h); line-height:var(--lane-h); border-radius:4px; padding:0 4px; font-size:8.2px; font-weight:700; color:#18202f; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border:1px solid rgba(0,0,0,.12); box-shadow:0 1px 1px rgba(0,0,0,.05); pointer-events:auto; }
+.event.cont-left { border-top-left-radius:0; border-bottom-left-radius:0; }
+.event.cont-right { border-top-right-radius:0; border-bottom-right-radius:0; }
+.task-btn {
+  position:absolute; top:3px; right:4px; z-index:8; width:18px; height:18px; padding:0; border:1px solid #cbd2dc; border-radius:5px;
+  background:#fff; color:#566070; font-size:13px; font-weight:700; line-height:16px; text-align:center; box-shadow:0 1px 2px rgba(0,0,0,.06);
+}
+.task-btn:hover { background:#f2f5f8; }
+.task-btn.has-tasks { background:#fff2ad; border-color:#d0ad24; color:#6f5600; }
+.task-btn.all-done { background:#daf3de; border-color:#82bf8c; color:#245a2e; }
+.legend { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:4px 10px; margin-top:9px; }
+.legend-item { display:flex; align-items:center; gap:5px; min-width:0; font-size:9px; line-height:1.2; }
+.swatch { width:12px; height:9px; border-radius:3px; border:1px solid rgba(0,0,0,.12); flex:0 0 auto; }
+.legend-text { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.note { margin:7px 2px 0; color:#7a8290; font-size:9px; }
+.task-popover {
+  position:fixed; z-index:9999; width:320px; max-height:min(440px, calc(100vh - 20px)); overflow:auto; background:#fff;
+  border:1px solid #cfd5df; border-radius:12px; box-shadow:0 18px 45px rgba(18,28,44,.22); padding:12px; display:none;
+}
+.task-popover.open { display:block; }
+.task-popover-head { display:flex; align-items:flex-start; justify-content:space-between; gap:10px; margin-bottom:9px; }
+.task-popover h3 { margin:0; font-size:15px; line-height:1.25; }
+.task-close { border:0; background:transparent; padding:0 3px; font-size:18px; line-height:18px; color:#7b8492; }
+.task-list { display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+.task-item { display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:7px; padding:7px; border:1px solid #e1e5eb; border-radius:7px; background:#fafbfc; }
+.task-item.done .task-text { text-decoration:line-through; color:#8b93a1; }
+.task-item input[type="checkbox"] { width:16px; height:16px; margin:0; }
+.task-text { font-size:13px; line-height:1.25; word-break:break-word; }
+.task-delete { border:0; background:transparent; color:#8a94a4; padding:2px 4px; font-size:14px; }
+.task-add-row { display:grid; grid-template-columns:1fr auto; gap:6px; }
+.task-input { width:100%; border:1px solid #cbd2dc; border-radius:7px; padding:8px; font-size:13px; }
+.task-add { border:1px solid #172033; background:#172033; color:#fff; border-radius:7px; padding:7px 10px; font-size:13px; }
+.task-empty { color:#8a94a4; font-size:12px; margin:2px 0 8px; }
+.task-storage-note { margin-top:8px; color:#9aa1ac; font-size:10px; line-height:1.25; }
+@media (max-width:900px) {
+  .legend { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .event { font-size:7px; }
+  .task-popover { width:min(320px, calc(100vw - 20px)); }
+}
+@page { size:A4 landscape; margin:7mm; }
+@media print {
+  :root { --daynum-h:17px; --lane-h:12.2px; --lane-gap:1.2px; }
+  body { background:white; }
+  .toolbar, .task-btn, .task-popover { display:none !important; }
+  .wrap { max-width:none; margin:0; padding:0; }
+  .month, .month.hidden-screen { display:block !important; box-shadow:none; border:0; border-radius:0; margin:0; padding:0; height:190mm; overflow:hidden; page-break-after:always; break-after:page; }
+  .month:last-child { page-break-after:auto; break-after:auto; }
+  .month-title { margin:0 0 5px; }
+  .month-title h1 { font-size:18px; }
+  .month-title .meta { font-size:8px; }
+  .weekday { font-size:8px; padding:3px; }
+  .daynum { font-size:7.5px; top:2px; left:4px; }
+  .event { font-size:6.3px; padding:0 2.5px; border-radius:2px; box-shadow:none; }
+  .legend { grid-template-columns:repeat(5,minmax(0,1fr)); gap:2px 7px; margin-top:5px; }
+  .legend-item { font-size:6.8px; gap:3px; }
+  .swatch { width:8px; height:6px; }
+  .note { display:none; }
+}
 </style>
 </head>
 <body>
@@ -254,21 +103,176 @@
   <button class="primary" onclick="window.print()">Tisk / Uložit jako PDF</button>
 </div>
 <div class="wrap" id="app"></div>
-
+<div id="taskPopover" class="task-popover" role="dialog" aria-label="Úkoly pro den">
+  <div class="task-popover-head">
+    <h3 class="task-date-title"></h3>
+    <button class="task-close" id="taskClose" type="button" title="Zavřít">×</button>
+  </div>
+  <div class="task-list"></div>
+  <div class="task-add-row">
+    <input class="task-input" type="text" placeholder="Napsat nový úkol…" autocomplete="off">
+    <button id="taskAddBtn" class="task-add" type="button">Přidat</button>
+  </div>
+  <div class="task-storage-note">Úkoly se ukládají pouze v tomto prohlížeči na tomto zařízení.</div>
+</div>
 <script>
 const trips = [{"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-01-09", "end": "2027-01-09"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-01-16", "end": "2027-01-16"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-01-23", "end": "2027-01-23"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-01-30", "end": "2027-01-30"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-02-12", "end": "2027-02-14"}, {"title": "Monte Carlo a festival citrusů v Mentonu", "start": "2027-02-12", "end": "2027-02-14"}, {"title": "Monte Carlo a festival citrusů v Mentonu", "start": "2027-02-19", "end": "2027-02-21"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-02-20", "end": "2027-02-20"}, {"title": "Monte Carlo a festival citrusů v Mentonu", "start": "2027-02-26", "end": "2027-02-28"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-02-27", "end": "2027-02-27"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-03-06", "end": "2027-03-06"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-03-13", "end": "2027-03-13"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-03-19", "end": "2027-03-21"}, {"title": "Katalánsko se zastávkou v Monaku", "start": "2027-03-24", "end": "2027-03-28"}, {"title": "Krásy Azurového pobřeží", "start": "2027-03-25", "end": "2027-03-28"}, {"title": "Velikonoční Provence se slavností býků", "start": "2027-03-25", "end": "2027-03-28"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-03-25", "end": "2027-03-28"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-03-26", "end": "2027-03-28"}, {"title": "Monako, Monte Carlo a Nice", "start": "2027-03-26", "end": "2027-03-28"}, {"title": "To nejlepší z Kodaně", "start": "2027-04-07", "end": "2027-04-08"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-04-09", "end": "2027-04-11"}, {"title": "Za zábavou do Paříže a Disneylandu", "start": "2027-04-09", "end": "2027-04-11"}, {"title": "Monako, Monte Carlo a Nice", "start": "2027-04-09", "end": "2027-04-11"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-04-10", "end": "2027-04-10"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-04-11", "end": "2027-04-11"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-04-15", "end": "2027-04-18"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-04-17", "end": "2027-04-17"}, {"title": "Krakov a solné doly Vělička", "start": "2027-04-17", "end": "2027-04-18"}, {"title": "Okruh historickými městy Polska", "start": "2027-04-22", "end": "2027-04-26"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-04-23", "end": "2027-04-25"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-04-24", "end": "2027-04-24"}, {"title": "Paříž a nejkrásnější zámky na Loiře", "start": "2027-04-29", "end": "2027-05-02"}, {"title": "Chorvatské národní parky a přímořská města", "start": "2027-04-29", "end": "2027-05-02"}, {"title": "Kodaň, Öresundský most a Malmö", "start": "2027-04-30", "end": "2027-05-02"}, {"title": "Karlštejn, Koněpruské jeskyně a Velká Amerika", "start": "2027-05-01", "end": "2027-05-01"}, {"title": "Putování údolím Wachau", "start": "2027-05-01", "end": "2027-05-01"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-05-01", "end": "2027-05-01"}, {"title": "Prater ve Vídni a Dům moří", "start": "2027-05-01", "end": "2027-05-01"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-05-01", "end": "2027-05-01"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-05-02", "end": "2027-05-02"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-05-06", "end": "2027-05-09"}, {"title": "Hlavní města Pobaltí a Helsinky", "start": "2027-05-07", "end": "2027-05-10"}, {"title": "Karlštejn, Koněpruské jeskyně a Velká Amerika", "start": "2027-05-08", "end": "2027-05-08"}, {"title": "Jezero Wolfgangsee a historická železnice", "start": "2027-05-08", "end": "2027-05-08"}, {"title": "Putování údolím Wachau", "start": "2027-05-08", "end": "2027-05-08"}, {"title": "Kouzelný zámek Franzensburg, čokoládovna a město Baden", "start": "2027-05-08", "end": "2027-05-08"}, {"title": "Krakov a solné doly Vělička", "start": "2027-05-08", "end": "2027-05-09"}, {"title": "Chorvatské národní parky a přímořská města", "start": "2027-05-13", "end": "2027-05-16"}, {"title": "Velký okruh severním Polskem", "start": "2027-05-13", "end": "2027-05-16"}, {"title": "Kodaň, Öresundský most a Malmö", "start": "2027-05-14", "end": "2027-05-16"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-05-14", "end": "2027-05-16"}, {"title": "Přírodní krásy Slovinska", "start": "2027-05-14", "end": "2027-05-16"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-05-15", "end": "2027-05-15"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-05-15", "end": "2027-05-15"}, {"title": "Paříž a nejkrásnější zámky na Loiře", "start": "2027-05-20", "end": "2027-05-23"}, {"title": "Provence s koupáním", "start": "2027-05-20", "end": "2027-05-23"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-05-20", "end": "2027-05-23"}, {"title": "Za zábavou do Paříže a Disneylandu", "start": "2027-05-21", "end": "2027-05-23"}, {"title": "Polské Trojměstí a písečná kosa Hel", "start": "2027-05-21", "end": "2027-05-23"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-05-22", "end": "2027-05-22"}, {"title": "Jednodenní výlet k jezeru Bled", "start": "2027-05-22", "end": "2027-05-22"}, {"title": "Velký okruh Provence", "start": "2027-05-26", "end": "2027-05-30"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-05-29", "end": "2027-05-29"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-05-29", "end": "2027-05-29"}, {"title": "Okolí Berchtesgadenu a Salzburg", "start": "2027-05-29", "end": "2027-05-30"}, {"title": "5denní okruh kolem Bodamského jezera – křižovatky tří zemí", "start": "2027-06-03", "end": "2027-06-06"}, {"title": "Paříž a nejkrásnější zámky na Loiře", "start": "2027-06-03", "end": "2027-06-06"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-06-05", "end": "2027-06-05"}, {"title": "Okolí Berchtesgadenu a Salzburg", "start": "2027-06-05", "end": "2027-06-06"}, {"title": "Dvoudenní výlet za poznáním Julských Alp", "start": "2027-06-05", "end": "2027-06-06"}, {"title": "Přírodní krásy Slovinska", "start": "2027-06-07", "end": "2027-06-09"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-06-14", "end": "2027-06-16"}, {"title": "Plitvická jezera", "start": "2027-06-14", "end": "2027-06-16"}, {"title": "Helsinky, hlavní města Pobaltí a národní park Lahemaa", "start": "2027-06-16", "end": "2027-06-20"}, {"title": "Provence s koupáním", "start": "2027-06-17", "end": "2027-06-20"}, {"title": "Plitvická jezera", "start": "2027-06-21", "end": "2027-06-23"}, {"title": "Podmanivé Slovinsko s koupáním u moře", "start": "2027-06-21", "end": "2027-06-24"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-06-22", "end": "2027-06-22"}, {"title": "Okruh Skandinávií s plavbou po fjordu", "start": "2027-06-23", "end": "2027-06-28"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-06-28", "end": "2027-06-30"}, {"title": "Přírodní krásy Slovinska", "start": "2027-06-28", "end": "2027-06-30"}, {"title": "Plitvická jezera", "start": "2027-06-28", "end": "2027-06-30"}, {"title": "Jezero Wolfgangsee a historická železnice", "start": "2027-06-29", "end": "2027-06-29"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-06-29", "end": "2027-06-29"}, {"title": "Okruh Skandinávií s plavbou po fjordu", "start": "2027-06-30", "end": "2027-07-05"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-07-01", "end": "2027-07-01"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-07-01", "end": "2027-07-01"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-07-05", "end": "2027-07-05"}, {"title": "Plitvická jezera", "start": "2027-07-05", "end": "2027-07-07"}, {"title": "Podmanivé Slovinsko s koupáním u moře", "start": "2027-07-05", "end": "2027-07-08"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-07-05", "end": "2027-07-05"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-07-05", "end": "2027-07-05"}, {"title": "Za zábavou do Paříže a Disneylandu", "start": "2027-07-05", "end": "2027-07-07"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-07-05", "end": "2027-07-07"}, {"title": "Putování údolím Wachau", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "Kouzelný zámek Franzensburg, čokoládovna a město Baden", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "Soutěska Sigmund Thun Klamm a Maiskogel", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "Jednodenní výlet k jezeru Bled", "start": "2027-07-06", "end": "2027-07-06"}, {"title": "Velký okruh severním Polskem", "start": "2027-07-07", "end": "2027-07-10"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-07-08", "end": "2027-07-08"}, {"title": "Karlštejn, Koněpruské jeskyně a Velká Amerika", "start": "2027-07-08", "end": "2027-07-08"}, {"title": "Kodaň, Öresundský most a Malmö", "start": "2027-07-12", "end": "2027-07-14"}, {"title": "Plitvická jezera", "start": "2027-07-12", "end": "2027-07-14"}, {"title": "Přírodní krásy Slovinska", "start": "2027-07-12", "end": "2027-07-14"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-07-13", "end": "2027-07-13"}, {"title": "Okruh Skandinávií s plavbou po fjordu", "start": "2027-07-14", "end": "2027-07-19"}, {"title": "Paříž a nejkrásnější zámky na Loiře", "start": "2027-07-15", "end": "2027-07-18"}, {"title": "Koupání a zábava u Neziderského jezera", "start": "2027-07-15", "end": "2027-07-15"}, {"title": "ZOO Herberstein a nejteplejší jezero v Alpách", "start": "2027-07-15", "end": "2027-07-15"}, {"title": "Plitvická jezera", "start": "2027-07-19", "end": "2027-07-21"}, {"title": "To nejlepší z Kodaně", "start": "2027-07-19", "end": "2027-07-20"}, {"title": "To nejlepší z Kodaně", "start": "2027-07-30", "end": "2027-07-31"}, {"title": "To nejlepší z Kodaně", "start": "2027-08-13", "end": "2027-08-14"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-07-20", "end": "2027-07-20"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-07-22", "end": "2027-07-22"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-07-22", "end": "2027-07-22"}, {"title": "Provence s koupáním", "start": "2027-07-24", "end": "2027-07-27"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-07-22", "end": "2027-07-22"}, {"title": "Jezero Wolfgangsee a historická železnice", "start": "2027-07-22", "end": "2027-07-22"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-07-24", "end": "2027-07-24"}, {"title": "Plitvická jezera", "start": "2027-07-26", "end": "2027-07-28"}, {"title": "Okruh Skandinávií s plavbou po fjordu", "start": "2027-07-28", "end": "2027-08-02"}, {"title": "Innsbruck a Křišťálové světy Swarovski", "start": "2027-07-28", "end": "2027-07-29"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-07-29", "end": "2027-07-29"}, {"title": "Plitvická jezera", "start": "2027-08-02", "end": "2027-08-04"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-08-02", "end": "2027-08-04"}, {"title": "Soutěska Sigmund Thun Klamm a Maiskogel", "start": "2027-08-03", "end": "2027-08-03"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-08-03", "end": "2027-08-03"}, {"title": "Okruh Skandinávií s plavbou po fjordu", "start": "2027-08-04", "end": "2027-08-09"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-08-05", "end": "2027-08-05"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-08-05", "end": "2027-08-05"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-08-05", "end": "2027-08-05"}, {"title": "Jednodenní výlet k jezeru Bled", "start": "2027-08-07", "end": "2027-08-07"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-08-08", "end": "2027-08-08"}, {"title": "Plitvická jezera", "start": "2027-08-09", "end": "2027-08-11"}, {"title": "ZOO Herberstein a nejteplejší jezero v Alpách", "start": "2027-08-09", "end": "2027-08-09"}, {"title": "Přírodní krásy Slovinska", "start": "2027-08-09", "end": "2027-08-11"}, {"title": "Putování údolím Wachau", "start": "2027-08-10", "end": "2027-08-10"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-08-10", "end": "2027-08-10"}, {"title": "Okruh Skandinávií s plavbou po fjordu", "start": "2027-08-11", "end": "2027-08-16"}, {"title": "Hlavní města Pobaltí a Helsinky", "start": "2027-08-12", "end": "2027-08-15"}, {"title": "Londýn, Windsor a Brighton", "start": "2027-08-12", "end": "2027-08-15"}, {"title": "Karlštejn, Koněpruské jeskyně a Velká Amerika", "start": "2027-08-12", "end": "2027-08-12"}, {"title": "Jezero Wolfgangsee a historická železnice", "start": "2027-08-12", "end": "2027-08-12"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-08-12", "end": "2027-08-12"}, {"title": "Jednodenní výlet k jezeru Bled", "start": "2027-08-14", "end": "2027-08-14"}, {"title": "Soutěska Sigmund Thun Klamm a Maiskogel", "start": "2027-08-14", "end": "2027-08-14"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-08-14", "end": "2027-08-14"}, {"title": "Za zábavou do Paříže a Disneylandu", "start": "2027-08-16", "end": "2027-08-18"}, {"title": "Plitvická jezera", "start": "2027-08-16", "end": "2027-08-18"}, {"title": "Jednodenní výlet k jezeru Bled", "start": "2027-08-17", "end": "2027-08-17"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-08-17", "end": "2027-08-17"}, {"title": "Podmanivé Slovinsko s koupáním u moře", "start": "2027-08-18", "end": "2027-08-21"}, {"title": "Severské metropole - Oslo, Stockholm, Kodaň, Göteborg", "start": "2027-08-18", "end": "2027-08-22"}, {"title": "Krásy Azurového pobřeží", "start": "2027-08-19", "end": "2027-08-22"}, {"title": "Koupání a zábava u Neziderského jezera", "start": "2027-08-19", "end": "2027-08-19"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-08-19", "end": "2027-08-19"}, {"title": "Okruh jižní Anglií s návštěvou Londýna", "start": "2027-08-20", "end": "2027-08-23"}, {"title": "Soutěska Sigmund Thun Klamm a Maiskogel", "start": "2027-08-21", "end": "2027-08-21"}, {"title": "Kodaň, Öresundský most a Malmö", "start": "2027-08-23", "end": "2027-08-25"}, {"title": "Plitvická jezera", "start": "2027-08-23", "end": "2027-08-25"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-08-24", "end": "2027-08-24"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-08-24", "end": "2027-08-24"}, {"title": "Velký okruh Provence", "start": "2027-08-25", "end": "2027-08-29"}, {"title": "Okruh Skandinávií s plavbou po fjordu", "start": "2027-08-25", "end": "2027-08-30"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-08-26", "end": "2027-08-26"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-08-27", "end": "2027-08-27"}, {"title": "Plitvická jezera", "start": "2027-08-30", "end": "2027-09-01"}, {"title": "Jednodenní výlet k jezeru Bled", "start": "2027-08-31", "end": "2027-08-31"}, {"title": "Jezero Wolfgangsee a historická železnice", "start": "2027-08-31", "end": "2027-08-31"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-09-02", "end": "2027-09-02"}, {"title": "Podmanivé Slovinsko s koupáním u moře", "start": "2027-09-02", "end": "2027-09-05"}, {"title": "Plitvická jezera", "start": "2027-09-06", "end": "2027-09-08"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-09-09", "end": "2027-09-12"}, {"title": "Polské Trojměstí a písečná kosa Hel", "start": "2027-09-10", "end": "2027-09-12"}, {"title": "Jednodenní výlet k jezeru Bled", "start": "2027-09-11", "end": "2027-09-11"}, {"title": "Dvoudenní výlet za poznáním Julských Alp", "start": "2027-09-11", "end": "2027-09-12"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-09-12", "end": "2027-09-12"}, {"title": "Přírodní krásy Slovinska", "start": "2027-09-13", "end": "2027-09-15"}, {"title": "Paříž a nejkrásnější zámky na Loiře", "start": "2027-09-16", "end": "2027-09-19"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-09-17", "end": "2027-09-19"}, {"title": "Krakov a solné doly Vělička", "start": "2027-09-18", "end": "2027-09-19"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-09-18", "end": "2027-09-18"}, {"title": "Alsasko a Burgundsko", "start": "2027-09-23", "end": "2027-09-28"}, {"title": "Katalánsko se zastávkou v Monaku", "start": "2027-09-23", "end": "2027-09-27"}, {"title": "Podhůří Pyrenejí s návštěvou Andorry", "start": "2027-09-23", "end": "2027-09-27"}, {"title": "Kodaň, Öresundský most a Malmö", "start": "2027-09-24", "end": "2027-09-26"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-09-24", "end": "2027-09-27"}, {"title": "Za zábavou do Paříže a Disneylandu", "start": "2027-09-24", "end": "2027-09-26"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-09-25", "end": "2027-09-25"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-09-25", "end": "2027-09-25"}, {"title": "To nejlepší z Kodaně", "start": "2027-09-27", "end": "2027-09-28"}, {"title": "Karlštejn, Koněpruské jeskyně a Velká Amerika", "start": "2027-09-28", "end": "2027-09-28"}, {"title": "Putování údolím Wachau", "start": "2027-09-28", "end": "2027-09-28"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-09-28", "end": "2027-09-28"}, {"title": "Kaňon Medvědí soutěska", "start": "2027-09-28", "end": "2027-09-28"}, {"title": "Výlet s návštěvou vyhlídky “5 fingers” za krásami Hallstattu", "start": "2027-09-28", "end": "2027-09-28"}, {"title": "Velký okruh Provence", "start": "2027-09-29", "end": "2027-10-03"}, {"title": "Velký okruh severním Polskem", "start": "2027-09-30", "end": "2027-10-03"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-09-30", "end": "2027-10-03"}, {"title": "Krásy Azurového pobřeží", "start": "2027-09-30", "end": "2027-10-03"}, {"title": "Za zábavou do Paříže a Disneylandu", "start": "2027-10-01", "end": "2027-10-03"}, {"title": "Innsbruck a Křišťálové světy Swarovski", "start": "2027-10-01", "end": "2027-10-02"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-10-01", "end": "2027-10-03"}, {"title": "Monako, Monte Carlo a Nice", "start": "2027-10-01", "end": "2027-10-03"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-10-03", "end": "2027-10-03"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-10-04", "end": "2027-10-04"}, {"title": "Chorvatské národní parky a přímořská města", "start": "2027-10-07", "end": "2027-10-10"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-10-07", "end": "2027-10-10"}, {"title": "To nejlepší z Kodaně", "start": "2027-10-08", "end": "2027-10-09"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-10-08", "end": "2027-10-09"}, {"title": "Krakov a solné doly Vělička", "start": "2027-10-09", "end": "2027-10-10"}, {"title": "Paříž a nejkrásnější zámky na Loiře", "start": "2027-10-14", "end": "2027-10-17"}, {"title": "Monako, Monte Carlo a Nice", "start": "2027-10-15", "end": "2027-10-17"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-10-15", "end": "2027-10-17"}, {"title": "Kodaň, Öresundský most a Malmö", "start": "2027-10-15", "end": "2027-10-17"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-10-16", "end": "2027-10-16"}, {"title": "Krakov a solné doly Vělička", "start": "2027-10-16", "end": "2027-10-17"}, {"title": "Velký okruh severním Polskem", "start": "2027-10-20", "end": "2027-10-23"}, {"title": "Krásy Azurového pobřeží", "start": "2027-10-21", "end": "2027-10-24"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-10-22", "end": "2027-10-24"}, {"title": "Za zábavou do Paříže a Disneylandu", "start": "2027-10-22", "end": "2027-10-24"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-10-23", "end": "2027-10-23"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-10-27", "end": "2027-10-30"}, {"title": "Chorvatské národní parky a přímořská města", "start": "2027-10-27", "end": "2027-10-30"}, {"title": "Katalánsko se zastávkou v Monaku", "start": "2027-10-27", "end": "2027-10-31"}, {"title": "ZOO Vídeň a zámek Schönbrunn", "start": "2027-10-28", "end": "2027-10-28"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-10-28", "end": "2027-10-30"}, {"title": "Monako, Monte Carlo a Nice", "start": "2027-10-28", "end": "2027-10-30"}, {"title": "Za zábavou do Paříže a Disneylandu", "start": "2027-10-28", "end": "2027-10-30"}, {"title": "Exkurze do Osvětimi se vstupem v ceně", "start": "2027-11-06", "end": "2027-11-06"}, {"title": "Monako, Monte Carlo a Nice", "start": "2027-11-12", "end": "2027-11-14"}, {"title": "Nejkrásnější místa Paříže", "start": "2027-11-12", "end": "2027-11-14"}, {"title": "Kouzelná Paříž a Versailles", "start": "2027-11-17", "end": "2027-11-20"}];
+const monthNamesTitle = ["Leden","Únor","Březen","Duben","Květen","Červen","Červenec","Srpen","Září","Říjen","Listopad","Prosinec"];
+const weekdays = ["Po","Út","St","Čt","Pá","So","Ne"];
+const TASK_STORAGE_PREFIX = "ck_calendar_a_tasks_v2" + "_";
 
-const YEAR=2027,monthNamesTitle=["Leden","Únor","Březen","Duben","Květen","Červen","Červenec","Srpen","Září","Říjen","Listopad","Prosinec"],weekdays=["Po","Út","St","Čt","Pá","So","Ne"],STATUS_LABELS=["ubytování","průvodce","pokyny","odbavení","rezervace"],STORAGE_KEY="ck-kalendar-2027-state-v2";
-function parseISO(s){const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d,12)} function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x} function mondayIndex(d){return(d+6)%7} function minDate(a,b){return a<b?a:b} function maxDate(a,b){return a>b?a:b} function fmt(d){return d.toLocaleDateString("cs-CZ")} function key(t){return`${t.title}|${t.start}|${t.end}`}
-function instructionDate(t){let d=addDays(t.startD,-10);if(d.getDay()===6)d=addDays(d,-1);else if(d.getDay()===0)d=addDays(d,-2);return d}
-function loadState(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{deleted:{},statuses:{}}}catch(e){return{deleted:{},statuses:{}}}} let state=loadState();state.deleted||={};state.statuses||={};function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
-trips.forEach((t,i)=>{t.id=i;t.startD=parseISO(t.start);t.endD=parseISO(t.end);t.key=key(t);t.instructionD=instructionDate(t)});function active(){return trips.filter(t=>!state.deleted[t.key])}
-const titles=[...new Set(trips.map(t=>t.title))].sort((a,b)=>a.localeCompare(b,"cs")),colorMap=new Map();titles.forEach((title,i)=>{const h=(i*137.508)%360,s=58+(i%3)*7,l=76-(i%4)*4;colorMap.set(title,`hsl(${h.toFixed(1)} ${s}% ${l}%)`)})
-function bounds(m){return{start:new Date(YEAR,m,1,12),end:new Date(YEAR,m+1,0,12)}} function weeks(m){const{start,end}=bounds(m),gs=addDays(start,-mondayIndex(start.getDay())),ge=addDays(end,6-mondayIndex(end.getDay())),a=[];for(let w=new Date(gs);w<=ge;w=addDays(w,7))a.push(Array.from({length:7},(_,i)=>addDays(w,i)));return a} function monthTrips(m){const{start,end}=bounds(m);return active().filter(t=>t.startD<=end&&t.endD>=start)} function monthInstructions(m){const{start,end}=bounds(m);return active().filter(t=>t.instructionD>=start&&t.instructionD<=end)}
-function segments(m,days){const mb=bounds(m),ws=days[0],we=days[6],a=[];for(const t of monthTrips(m)){const x=maxDate(t.startD,maxDate(ws,mb.start)),y=minDate(t.endD,minDate(we,mb.end));if(x<=y)a.push({kind:"trip",trip:t,start:x,end:y,startCol:mondayIndex(x.getDay()),endCol:mondayIndex(y.getDay()),left:t.startD<x,right:t.endD>y})}for(const t of monthInstructions(m)){const d=t.instructionD;if(d>=ws&&d<=we)a.push({kind:"instruction",trip:t,start:d,end:d,startCol:mondayIndex(d.getDay()),endCol:mondayIndex(d.getDay())})}a.sort((x,y)=>x.start-y.start||(x.kind==="instruction"?-1:1)||y.end-x.end);const ends=[];for(const x of a){let l=ends.findIndex(e=>x.start>e);if(l<0){l=ends.length;ends.push(x.end)}else ends[l]=x.end;x.lane=l}return{segs:a,laneCount:ends.length}}
-function createMonth(m){const sec=document.createElement("section");sec.className="month";sec.dataset.month=m;const items=monthTrips(m),ins=monthInstructions(m),unique=[...new Set(items.map(x=>x.title))].sort((a,b)=>a.localeCompare(b,"cs"));const head=document.createElement("div");head.className="month-title";head.innerHTML=`<h1>${monthNamesTitle[m]} ${YEAR}</h1><div class="meta">${items.length} termínů · ${unique.length} různých zájezdů · ${ins.length} pokynů</div>`;sec.appendChild(head);const wr=document.createElement("div");wr.className="weekday-row";weekdays.forEach(w=>{const e=document.createElement("div");e.className="weekday";e.textContent=w;wr.appendChild(e)});sec.appendChild(wr);for(const ds of weeks(m)){const{segs,laneCount}=segments(m,ds),w=document.createElement("div");w.className="week";w.style.height=`calc(var(--daynum-h) + ${Math.max(laneCount,1)} * (var(--lane-h) + var(--lane-gap)) + 5px)`;ds.forEach((d,i)=>{const c=document.createElement("div");c.className="day";if(d.getMonth()!==m)c.classList.add("out");if(i>=5)c.classList.add("weekend");c.innerHTML=`<div class="daynum">${d.getDate()}</div>`;w.appendChild(c)});const layer=document.createElement("div");layer.className="events";for(const x of segs){const e=document.createElement("div");e.className="event"+(x.kind==="instruction"?" instruction-event":"")+(x.left?" cont-left":"")+(x.right?" cont-right":"");e.style.left=`calc(${x.startCol} * (100% / 7) + 2px)`;e.style.width=`calc(${x.endCol-x.startCol+1} * (100% / 7) - 4px)`;e.style.top=`calc(${x.lane} * (var(--lane-h) + var(--lane-gap)))`;if(x.kind==="trip")e.style.background=colorMap.get(x.trip.title);e.textContent=x.kind==="instruction"?`Pokyny pro zájezd ${x.trip.title}`:x.trip.title;e.title=x.kind==="instruction"?`${e.textContent} · ${fmt(x.trip.instructionD)} · odjezd ${fmt(x.trip.startD)}`:`${x.trip.title} · ${fmt(x.trip.startD)}–${fmt(x.trip.endD)}`;layer.appendChild(e)}w.appendChild(layer);sec.appendChild(w)}const leg=document.createElement("div");leg.className="legend";unique.forEach(title=>{const i=document.createElement("div");i.className="legend-item";i.innerHTML=`<span class="swatch" style="background:${colorMap.get(title)}"></span><span class="legend-text">${title}</span>`;leg.appendChild(i)});if(ins.length){const i=document.createElement("div");i.className="legend-item";i.innerHTML='<span class="swatch" style="background:#fff1a8;border-color:#d6a700"></span><span class="legend-text">Pokyny – 10 dní před odjezdem</span>';leg.appendChild(i)}sec.appendChild(leg);const note=document.createElement("div");note.className="note";note.textContent="Pokyny se zobrazují 10 dní před odjezdem; sobota nebo neděle se přesouvá na předchozí pátek.";sec.appendChild(note);return sec}
-function workPanel(m){const p=document.createElement("section");p.className="work-panel";p.innerHTML=`<h2>Kontrola zájezdů – ${monthNamesTitle[m]} ${YEAR}</h2><p class="work-help">Kliknutím označíš hotový úkol zeleně. Stav i odstraněné termíny se ukládají v tomto prohlížeči.</p>`;const list=document.createElement("div");list.className="trip-list";monthTrips(m).slice().sort((a,b)=>a.startD-b.startD||a.title.localeCompare(b.title,"cs")).forEach(t=>{const c=document.createElement("div");c.className="trip-card";c.style.setProperty("--trip-color",colorMap.get(t.title));const main=document.createElement("div");main.innerHTML=`<div class="trip-name">${t.title}</div><div class="trip-date">${fmt(t.startD)}–${fmt(t.endD)} · pokyny: ${fmt(t.instructionD)}</div>`;const bs=document.createElement("div");bs.className="status-buttons";STATUS_LABELS.forEach(label=>{const b=document.createElement("button");b.className="status-btn"+(state.statuses[t.key]?.[label]?" done":"");b.textContent=label;b.onclick=()=>{state.statuses[t.key]||={};state.statuses[t.key][label]=!state.statuses[t.key][label];save();b.classList.toggle("done")};bs.appendChild(b)});const del=document.createElement("button");del.className="delete-btn";del.textContent="Odstranit";del.onclick=()=>{if(confirm(`Opravdu odstranit termín „${t.title}“ (${fmt(t.startD)})?`)){state.deleted[t.key]=true;save();render(m)}};c.append(main,bs,del);list.appendChild(c)});p.appendChild(list);return p}
-const app=document.getElementById("app"),select=document.getElementById("monthSelect");let months=[],currentIndex=0;function computeMonths(){const set=new Set();active().forEach(t=>{let d=new Date(t.startD);while(d<=t.endD){if(d.getFullYear()===YEAR)set.add(d.getMonth());d=new Date(d.getFullYear(),d.getMonth()+1,1,12)}if(t.instructionD.getFullYear()===YEAR)set.add(t.instructionD.getMonth())});return[...set].sort((a,b)=>a-b)} function render(pref){months=computeMonths();if(!months.length){app.innerHTML="<p>Všechny zájezdy byly odstraněny.</p>";select.innerHTML="";return}let m=months.includes(pref)?pref:months[Math.min(currentIndex,months.length-1)];currentIndex=months.indexOf(m);app.innerHTML="";months.forEach(x=>app.appendChild(createMonth(x)));app.appendChild(workPanel(m));select.innerHTML="";months.forEach(x=>{const o=document.createElement("option");o.value=x;o.textContent=`${monthNamesTitle[x]} ${YEAR}`;select.appendChild(o)});show()} function show(){document.querySelectorAll(".month").forEach(el=>el.classList.toggle("hidden-screen",Number(el.dataset.month)!==months[currentIndex]));select.value=months[currentIndex];const old=document.querySelector(".work-panel");if(old)old.replaceWith(workPanel(months[currentIndex]))} document.getElementById("prev").onclick=()=>{currentIndex=(currentIndex-1+months.length)%months.length;show()};document.getElementById("next").onclick=()=>{currentIndex=(currentIndex+1)%months.length;show()};select.onchange=()=>{currentIndex=months.indexOf(Number(select.value));show()};render();
+function parseISO(s) { const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d,12,0,0); }
+function dateKey(d) { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
+function addDays(d,n) { const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function mondayIndex(jsDay) { return (jsDay+6)%7; }
+function minDate(a,b) { return a<b?a:b; }
+function maxDate(a,b) { return a>b?a:b; }
+
+trips.forEach((t,i)=>{ t.id=i; t.startD=parseISO(t.start); t.endD=parseISO(t.end); });
+const titles=[...new Set(trips.map(t=>t.title))].sort((a,b)=>a.localeCompare(b,"cs"));
+const colorMap=new Map();
+titles.forEach((title,i)=>{
+  const hue=(i*137.508)%360; const sat=58+(i%3)*7; const light=76-(i%4)*4;
+  colorMap.set(title,`hsl(${hue.toFixed(1)} ${sat}% ${light}%)`);
+});
+
+function monthBounds(year,month) { return {start:new Date(year,month,1,12), end:new Date(year,month+1,0,12)}; }
+function monthWeeks(year,month) {
+  const {start,end}=monthBounds(year,month);
+  const gridStart=addDays(start,-mondayIndex(start.getDay()));
+  const gridEnd=addDays(end,6-mondayIndex(end.getDay()));
+  const weeks=[];
+  for(let w=new Date(gridStart);w<=gridEnd;w=addDays(w,7)) weeks.push(Array.from({length:7},(_,i)=>addDays(w,i)));
+  return weeks;
+}
+function monthTrips(year,month) { const {start,end}=monthBounds(year,month); return trips.filter(t=>t.startD<=end && t.endD>=start); }
+function segmentsForWeek(year,month,weekDays) {
+  const m=monthBounds(year,month), ws=weekDays[0], we=weekDays[6], segs=[];
+  for(const t of monthTrips(year,month)) {
+    const a=maxDate(t.startD,maxDate(ws,m.start)), b=minDate(t.endD,minDate(we,m.end));
+    if(a<=b) segs.push({trip:t,start:a,end:b,startCol:mondayIndex(a.getDay()),endCol:mondayIndex(b.getDay()),continuesLeft:t.startD<a,continuesRight:t.endD>b});
+  }
+  segs.sort((x,y)=>x.start-y.start || y.end-x.end || x.trip.title.localeCompare(y.trip.title,"cs"));
+  const laneEnds=[];
+  for(const s of segs) {
+    let lane=-1;
+    for(let i=0;i<laneEnds.length;i++) if(s.start>laneEnds[i]) { lane=i; break; }
+    if(lane===-1) { lane=laneEnds.length; laneEnds.push(s.end); } else laneEnds[lane]=s.end;
+    s.lane=lane;
+  }
+  return {segs,laneCount:laneEnds.length};
+}
+
+function loadTasks(dateStr) {
+  try { return JSON.parse(localStorage.getItem(TASK_STORAGE_PREFIX+dateStr)||"[]"); } catch(e) { return []; }
+}
+function saveTasks(dateStr,tasks) { localStorage.setItem(TASK_STORAGE_PREFIX+dateStr,JSON.stringify(tasks)); }
+function updateTaskButton(btn) {
+  const tasks=loadTasks(btn.dataset.date), open=tasks.filter(t=>!t.done).length;
+  btn.classList.toggle("has-tasks",tasks.length>0 && open>0);
+  btn.classList.toggle("all-done",tasks.length>0 && open===0);
+  btn.textContent=tasks.length ? (open>0 ? String(open) : "✓") : "+";
+  btn.title=tasks.length ? `${tasks.length} úkolů, zbývá ${open}` : "Přidat úkoly";
+}
+function refreshTaskButtons(dateStr) { document.querySelectorAll(`.task-btn[data-date="${dateStr}"]`).forEach(updateTaskButton); }
+
+let activeTaskDate=null, activeTaskButton=null;
+function formatCzDate(dateStr) { return parseISO(dateStr).toLocaleDateString("cs-CZ",{weekday:"long",day:"numeric",month:"long",year:"numeric"}); }
+function renderTaskPopover() {
+  if(!activeTaskDate) return;
+  const box=document.getElementById("taskPopover"), tasks=loadTasks(activeTaskDate), list=box.querySelector(".task-list");
+  box.querySelector(".task-date-title").textContent=formatCzDate(activeTaskDate);
+  list.innerHTML="";
+  if(!tasks.length) { const e=document.createElement("div"); e.className="task-empty"; e.textContent="Zatím tu nejsou žádné úkoly."; list.appendChild(e); }
+  tasks.forEach((task,idx)=>{
+    const row=document.createElement("div"); row.className="task-item"+(task.done?" done":"");
+    const cb=document.createElement("input"); cb.type="checkbox"; cb.checked=!!task.done;
+    cb.addEventListener("change",()=>{ const cur=loadTasks(activeTaskDate); if(cur[idx]) cur[idx].done=cb.checked; saveTasks(activeTaskDate,cur); renderTaskPopover(); refreshTaskButtons(activeTaskDate); });
+    const txt=document.createElement("div"); txt.className="task-text"; txt.textContent=task.text;
+    const del=document.createElement("button"); del.className="task-delete"; del.type="button"; del.textContent="✕"; del.title="Smazat úkol";
+    del.addEventListener("click",()=>{ const cur=loadTasks(activeTaskDate); cur.splice(idx,1); saveTasks(activeTaskDate,cur); renderTaskPopover(); refreshTaskButtons(activeTaskDate); });
+    row.append(cb,txt,del); list.appendChild(row);
+  });
+}
+function positionTaskPopover(btn) {
+  const box=document.getElementById("taskPopover"), r=btn.getBoundingClientRect(), pad=10, w=Math.min(320,window.innerWidth-20);
+  let left=r.right+8; if(left+w>window.innerWidth-pad) left=Math.max(pad,r.left-w-8);
+  let top=r.top; const approxH=Math.min(440,window.innerHeight-20); if(top+approxH>window.innerHeight-pad) top=Math.max(pad,window.innerHeight-approxH-pad);
+  box.style.left=`${left}px`; box.style.top=`${top}px`;
+}
+function openTaskPopover(d,btn) {
+  activeTaskDate=dateKey(d); activeTaskButton=btn; renderTaskPopover(); positionTaskPopover(btn);
+  document.getElementById("taskPopover").classList.add("open");
+  setTimeout(()=>document.querySelector("#taskPopover .task-input").focus(),0);
+}
+function closeTaskPopover() { document.getElementById("taskPopover").classList.remove("open"); activeTaskDate=null; activeTaskButton=null; }
+function addTaskFromInput() {
+  if(!activeTaskDate) return;
+  const input=document.querySelector("#taskPopover .task-input"), text=input.value.trim(); if(!text) return;
+  const tasks=loadTasks(activeTaskDate); tasks.push({text,done:false}); saveTasks(activeTaskDate,tasks); input.value="";
+  renderTaskPopover(); refreshTaskButtons(activeTaskDate);
+}
+
+function createMonth(year,month) {
+  const section=document.createElement("section"); section.className="month"; section.dataset.year=year; section.dataset.month=month;
+  const items=monthTrips(year,month), unique=[...new Set(items.map(x=>x.title))].sort((a,b)=>a.localeCompare(b,"cs"));
+  const head=document.createElement("div"); head.className="month-title";
+  head.innerHTML=`<h1>${monthNamesTitle[month]} ${year}</h1><div class="meta">${items.length} termínů · ${unique.length} různých zájezdů</div>`;
+  section.appendChild(head);
+  const wr=document.createElement("div"); wr.className="weekday-row";
+  weekdays.forEach(w=>{ const el=document.createElement("div"); el.className="weekday"; el.textContent=w; wr.appendChild(el); }); section.appendChild(wr);
+  for(const weekDays of monthWeeks(year,month)) {
+    const {segs,laneCount}=segmentsForWeek(year,month,weekDays), week=document.createElement("div"); week.className="week";
+    week.style.height=`calc(var(--daynum-h) + ${Math.max(laneCount,1)} * (var(--lane-h) + var(--lane-gap)) + 7px)`;
+    weekDays.forEach((d,idx)=>{
+      const cell=document.createElement("div"); cell.className="day"; const inMonth=(d.getFullYear()===year && d.getMonth()===month);
+      if(!inMonth) cell.classList.add("out"); if(idx>=5) cell.classList.add("weekend");
+      const n=document.createElement("div"); n.className="daynum"; n.textContent=d.getDate(); cell.appendChild(n);
+      if(inMonth) {
+        const btn=document.createElement("button"); btn.className="task-btn"; btn.type="button"; btn.dataset.date=dateKey(d); btn.textContent="+"; btn.title="Přidat úkoly";
+        btn.addEventListener("click",ev=>{ ev.stopPropagation(); openTaskPopover(d,btn); }); cell.appendChild(btn); updateTaskButton(btn);
+      }
+      week.appendChild(cell);
+    });
+    const layer=document.createElement("div"); layer.className="events";
+    for(const s of segs) {
+      const el=document.createElement("div"); el.className="event"; if(s.continuesLeft) el.classList.add("cont-left"); if(s.continuesRight) el.classList.add("cont-right");
+      el.style.left=`calc(${s.startCol} * (100% / 7) + 2px)`; el.style.width=`calc(${s.endCol-s.startCol+1} * (100% / 7) - 4px)`;
+      el.style.top=`calc(${s.lane} * (var(--lane-h) + var(--lane-gap)))`; el.style.background=colorMap.get(s.trip.title);
+      el.title=`${s.trip.title} · ${s.trip.startD.toLocaleDateString("cs-CZ")}–${s.trip.endD.toLocaleDateString("cs-CZ")}`; el.textContent=s.trip.title; layer.appendChild(el);
+    }
+    week.appendChild(layer); section.appendChild(week);
+  }
+  if(unique.length) {
+    const legend=document.createElement("div"); legend.className="legend";
+    unique.forEach(title=>{ const item=document.createElement("div"); item.className="legend-item"; item.title=title; item.innerHTML=`<span class="swatch" style="background:${colorMap.get(title)}"></span><span class="legend-text">${title}</span>`; legend.appendChild(item); });
+    section.appendChild(legend);
+  }
+  const note=document.createElement("div"); note.className="note";
+  note.textContent=unique.length ? "Stejný zájezd má ve všech měsících stejnou barvu. + vpravo nahoře u dne otevře osobní úkoly." : "Prázdný měsíc bez zájezdů. + vpravo nahoře u každého dne otevře osobní úkoly.";
+  section.appendChild(note); return section;
+}
+
+const app=document.getElementById("app");
+const monthKeys=[];
+for(let y=2026;y<=2027;y++) { const from=(y===2026?9:0), to=11; for(let m=from;m<=to;m++) monthKeys.push({year:y,month:m}); }
+monthKeys.forEach(k=>app.appendChild(createMonth(k.year,k.month)));
+
+const select=document.getElementById("monthSelect");
+monthKeys.forEach((k,i)=>{ const o=document.createElement("option"); o.value=String(i); o.textContent=`${monthNamesTitle[k.month]} ${k.year}`; select.appendChild(o); });
+let currentIndex=0;
+function showMonth() { document.querySelectorAll(".month").forEach((el,i)=>el.classList.toggle("hidden-screen",i!==currentIndex)); select.value=String(currentIndex); closeTaskPopover(); }
+document.getElementById("prev").onclick=()=>{ currentIndex=(currentIndex-1+monthKeys.length)%monthKeys.length; showMonth(); };
+document.getElementById("next").onclick=()=>{ currentIndex=(currentIndex+1)%monthKeys.length; showMonth(); };
+select.onchange=()=>{ currentIndex=Number(select.value); showMonth(); };
+document.getElementById("taskAddBtn").addEventListener("click",addTaskFromInput);
+document.getElementById("taskClose").addEventListener("click",closeTaskPopover);
+document.querySelector("#taskPopover .task-input").addEventListener("keydown",e=>{ if(e.key==="Enter") addTaskFromInput(); });
+document.addEventListener("click",e=>{ const box=document.getElementById("taskPopover"); if(box.classList.contains("open") && !box.contains(e.target) && !e.target.closest(".task-btn")) closeTaskPopover(); });
+window.addEventListener("resize",()=>{ if(activeTaskButton) positionTaskPopover(activeTaskButton); });
+window.addEventListener("scroll",()=>{ if(activeTaskButton) positionTaskPopover(activeTaskButton); },true);
+
+showMonth();
 </script>
 </body>
 </html>
