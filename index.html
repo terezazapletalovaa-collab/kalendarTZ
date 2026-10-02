@@ -333,9 +333,13 @@ function instructionDueDate(t) {
 function instructionRemindersForMonth(year,month) {
   if(!showInstructionReminders) return [];
   return trips
-    .filter(t=>!isTripDeleted(t) && !loadWork(t.uid).pokyny)
-    .map(t=>({trip:t,date:instructionDueDate(t)}))
-    .filter(r=>r.date.getFullYear()===year && r.date.getMonth()===month);
+    .filter(t => {
+      if(isTripDeleted(t)) return false;
+      const state = loadWork(t.uid);
+      return !state.pokyny;
+    })
+    .map(t => ({trip:t,date:instructionDueDate(t)}))
+    .filter(r => r.date.getFullYear()===year && r.date.getMonth()===month);
 }
 function formatShortDate(d) {
   return d.toLocaleDateString("cs-CZ",{day:"numeric",month:"numeric"});
@@ -368,6 +372,7 @@ function toggleWorkField(t,field) {
   state[field]=!state[field];
   saveWork(t.uid,state);
   renderAllMonths();
+  updateInstructionToggleButton();
 }
 function deleteTripFromCalendar(t) {
   const state=loadWork(t.uid);
@@ -383,9 +388,7 @@ function departuresForMonth(year,month) {
   );
 }
 function formatTripRange(t) {
-  const s=t.startD.toLocaleDateString("cs-CZ");
-  const e=t.endD.toLocaleDateString("cs-CZ");
-  return s===e ? s : `${s} – ${e}`;
+  return t.startD.toLocaleDateString("cs-CZ");
 }
 function buildWorkOverview(year,month) {
   const wrap=document.createElement("div");
